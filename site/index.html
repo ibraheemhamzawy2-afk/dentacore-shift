@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DentaCore Shift — شيفتات عيادات الأسنان</title>
+<meta name="description" content="احجز شيفت في عيادة أسنان مجهزة، أو اعرض كراسي عيادتك الفاضية.">
+<meta name="theme-color" content="#0B1526">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DentaCore Shift">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+<style>
+:root{--accent:#0B1526;--accent-d:#7A5C26;--accent-l:#F3EAD6;--gold:#C6A15B;--ivory:#F7F4EE;--ink:#0B1526;--muted:#5B6270;--line:#E7E1D4;--bg:#F7F4EE;--warn:#9A3412;--warn-l:#FFF1E8;--bad:#B42318;--bad-l:#FDECEA}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;font-size:15px;line-height:1.5}
+a{color:var(--accent-d)}
+#app{max-width:560px;margin:0 auto;min-height:100vh;padding-bottom:88px}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px}
+.brand{display:flex;align-items:center;gap:10px;direction:ltr;text-decoration:none;color:var(--ink)}
+.logo{width:40px;height:40px;border-radius:11px;background:var(--accent);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(198,161,91,.35)}
+.logo svg{width:30px;height:30px}
+.bname{display:flex;flex-direction:column;line-height:1;font-family:'Montserrat',system-ui,sans-serif}
+.bname small{font-size:9.5px;letter-spacing:.28em;font-weight:600;color:var(--accent-d)}
+.bname b{font-size:21px;font-weight:700;letter-spacing:.01em;margin-top:3px}
+.bname b::after{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gold);margin-left:3px}
+main{padding:0 16px;display:flex;flex-direction:column;gap:12px}
+h1{font-size:22px;margin:4px 0}h2{font-size:16px;margin:0 0 8px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 1px 2px rgba(11,21,38,.04)}
+.muted{color:var(--muted);font-size:13px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}
+input,select,textarea{width:100%;font:inherit;border:1px solid #CBD2DA;border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink);min-height:46px}
+textarea{min-height:80px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-offset:1px}
+.btn{font:inherit;font-weight:600;border:none;border-radius:12px;min-height:46px;padding:0 16px;cursor:pointer;background:var(--accent);color:var(--ivory);display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn:hover{background:#1A2740}
+.btn.sec{background:#fff;color:var(--ink);border:1px solid #CBD2DA}
+.btn.bad{background:#fff;color:var(--bad);border:1px solid #F1B5AE}
+.btn.block{width:100%}
+.btn.wa{background:#1F8F55;color:#fff}.btn.wa:hover{background:#18784A}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.chip{font-size:12px;border-radius:8px;padding:3px 8px;background:#EEF1F5;color:#2D3748;display:inline-block}
+.chip.ok{background:var(--accent-l);color:var(--accent-d);font-weight:600}
+.chip.warn{background:var(--warn-l);color:var(--warn);font-weight:600}
+.chip.bad{background:var(--bad-l);color:var(--bad);font-weight:600}
+.price{font-size:18px;font-weight:700;color:var(--warn)}
+.big{font-size:26px;font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.seg button{font:inherit;font-weight:600;min-height:46px;border-radius:12px;border:1px solid #CBD2DA;background:#fff;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{border:2px solid var(--gold);background:var(--accent-l);color:var(--accent-d)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.tabs button{font:inherit;font-size:13px;white-space:nowrap;border:1px solid #CBD2DA;background:#fff;border-radius:18px;padding:8px 14px;cursor:pointer;color:var(--ink)}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+nav.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom)}
+nav.bottom .in{max-width:560px;width:100%;display:grid;grid-auto-flow:column;grid-auto-columns:1fr}
+nav.bottom a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:64px;font-size:12px;color:var(--muted);text-decoration:none}
+nav.bottom a[aria-current="page"]{color:var(--ink);font-weight:700;box-shadow:inset 0 3px 0 var(--gold)}
+.thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.thumbs img{width:100%;height:90px;object-fit:cover;border-radius:10px;background:#E6EAEF}
+.notice{border-radius:12px;padding:10px 12px;font-size:14px;background:var(--warn-l);color:var(--warn)}
+.notice.ok{background:var(--accent-l);color:var(--accent-d)}
+#toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;display:none;z-index:9;max-width:90%}
+.spin{padding:40px;text-align:center;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 4px;border-bottom:1px solid #EEF1F5;text-align:right}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div id="app"><div class="spin">جاري التحميل…</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* ===================== الإعداد: حط بيانات مشروعك هنا ===================== */
+const SUPABASE_URL  = 'https://umppraumetxvrotxuyph.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_U1dAPqOTaIvqeopGgSjt-w_dZpQFbeF';
+// بيانات بتظهر في صفحات السياسات
+const LEGAL = { owner:'د. إبراهيم حمزاوي', email:'[إيميل الدعم]', whatsapp:'[رقم واتساب الدعم]', updated:'١١ نوفمبر ٢٠٢٦', version:'2026-11-11' };
+/* ======================================================================== */
+
+const configured = SUPABASE_URL.startsWith('https://');
+const sb = configured ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON) : null;
+const app = document.getElementById('app');
+const S = { session:null, me:null, doctor:null, clinic:null, settings:{} };
+
+/* ---------- أدوات ---------- */
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => (n == null ? '—' : Number(n).toLocaleString('ar-EG') + ' جنيه');
+const dateAr = d => new Date(d + 'T00:00:00').toLocaleDateString('ar-EG', {weekday:'long', day:'numeric', month:'long'});
+const timeAr = t => { const [h,m] = t.split(':').map(Number); const p = h < 12 ? 'ص' : 'م'; const hh = h % 12 || 12; return `${hh.toLocaleString('ar-EG')}${m ? ':' + String(m).padStart(2,'0') : ''} ${p}`; };
+const dtAr = ts => new Date(ts).toLocaleString('ar-EG', {day:'numeric', month:'short', hour:'numeric', minute:'2-digit'});
+const $ = id => document.getElementById(id);
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 3500); }
+function errMsg(e){ const m = e?.message || String(e); if (/Failed to fetch|Load failed|NetworkError/i.test(m)) return 'مشكلة في الاتصال بالإنترنت، حاول تاني'; if (/Invalid login/i.test(m)) return 'الإيميل أو كلمة السر غلط'; if (/already registered/i.test(m)) return 'الإيميل ده مسجل قبل كده'; if (/Password should be/i.test(m)) return 'كلمة السر لازم تكون 8 حروف على الأقل'; if (/Email not confirmed/i.test(m)) return 'أكّد إيميلك الأول من الرسالة اللي وصلتك'; return m; }
+async function run(btn, fn){ if (btn) btn.disabled = true; try { await fn(); } catch(e){ toast(errMsg(e)); console.error(e); } finally { if (btn) btn.disabled = false; } }
+function must(res){ if (res.error) throw res.error; return res.data; }
+const MARK = '<svg viewBox="0 0 100 100" fill="none" aria-hidden="true"><path d="M22 12 H50 A38 38 0 0 1 50 88 H22 Z" stroke="#C6A15B" stroke-width="7" stroke-linejoin="round"/><path d="M66.73 37.27 A18 18 0 1 0 66.73 62.73" stroke="#C6A15B" stroke-width="7" stroke-linecap="round"/><circle cx="54" cy="50" r="6" fill="#F7F4EE"/></svg>';
+const icon = {
+  search:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  cal:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',
+  user:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  home:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  plus:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  shield:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg>',
+  key:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg>',
+  wa:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2s.2-1.1.1-1.2-.2-.2-.4-.3z"/></svg>',
+  clock:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+};
+const statusLabel = {
+  pending_payment:['في انتظار التحويل','warn'], payment_review:['التحويل بيتراجع','warn'], confirmed:['مؤكد','ok'],
+  settlement_due:['مطلوب تسوية','warn'], settlement_review:['التسوية بتتراجع','warn'], completed:['مكتمل','ok'],
+  cancelled:['ملغي','bad'], expired:['انتهت المهلة','bad'],
+  open:['متاح','ok'], held:['محجوز مؤقتًا','warn'], booked:['محجوز','ok'],
+  pending:['بيتراجع','warn'], verified:['موثّق','ok'], rejected:['مرفوض','bad'], approved:['تم','ok'],
+  active:['معروض','ok'], rented:['اتأجرت','ok'], closed:['مقفول',''], new:['جديد','warn'], contacted:['اتواصلنا','warn'],
+  viewing:['معاينة','warn'], negotiating:['تفاوض','warn'], signed:['اتمضى العقد','ok'], lost:['اتقفل','bad']
+};
+const chip = s => { const [t,c] = statusLabel[s] || [s,'']; return `<span class="chip ${c}">${esc(t)}</span>`; };
+const priceText = s => s.mode === 'fixed' ? money(s.price) : `${Number(s.percent).toLocaleString('ar-EG')}% من الدخل`;
+const modeText = s => s.mode === 'fixed' ? 'سعر ثابت للشيفت' : `بالنسبة · حد أدنى ${money(s.min_guarantee)}`;
+const mediaUrl = p => sb.storage.from('media').getPublicUrl(p).data.publicUrl;
+const csv = v => (v || '').split(/[،,]/).map(x => x.trim()).filter(Boolean).slice(0, 15);
+
+/* ضغط الصور قبل الرفع (يوفر المساحة) */
+async function compress(file, max = 1600){
+  if (!file.type.startsWith('image/')) return file;
+  const img = await createImageBitmap(file);
+  const r = Math.min(1, max / Math.max(img.width, img.height));
+  const c = document.createElement('canvas'); c.width = Math.round(img.width * r); c.height = Math.round(img.height * r);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return await new Promise(res => c.toBlob(res, 'image/jpeg', 0.8));
+}
+async function upload(bucket, folder, file){
+  if (!file) return null;
+  if (file.size > 10 * 1024 * 1024) throw new Error('الملف كبير جدًا');
+  const blob = await compress(file);
+  const ext = blob.type === 'application/pdf' ? 'pdf' : 'jpg';
+  const path = `${S.session.user.id}/${folder}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+  must(await sb.storage.from(bucket).upload(path, blob, { contentType: blob.type || 'image/jpeg', upsert:false }));
+  return path;
+}
+async function openDoc(path){
+  const d = must(await sb.storage.from('docs').createSignedUrl(path, 300));
+  window.open(d.signedUrl, '_blank', 'noopener');
+}
+
+/* ---------- السياسات ---------- */
+const DEF = { commission_fixed_pct:15, commission_percent_pct:5, commission_min:100, monthly_cap_pair:600, hire_fee:2000, hire_min:1000,
+  hire_protect_months:6, hold_hours:3, cancel_free_hours:24, rental_min_months:12, rental_commission_months:1, rental_tenant_pct:50, rental_protect_months:12 };
+const DV = k => Number(S.settings?.[k] ?? DEF[k]);
+const waNum = n => { let d = String(n || '').replace(/[^0-9]/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.startsWith('0')) d = '2' + d; return d.length >= 11 ? d : ''; };
+const waHref = (num, text) => `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+function waVerifyBox(kind, st, info){
+  const num = waNum(S.settings?.support_whatsapp);
+  const docs = kind === 'doctor' ? ['صورة كارنيه النقابة (الوشين)', 'أو صورة ترخيص مزاولة المهنة'] : ['صورة شهادة تسجيل العيادة في النقابة', 'أو صورة ترخيص العيادة'];
+  const msg = [`توثيق حساب ${kind === 'doctor' ? 'طبيب' : 'عيادة'} — DentaCore Shift`, ...info, `الإيميل: ${S.session.user.email}`, kind === 'doctor' ? 'مرفق: كارنيه النقابة أو ترخيص مزاولة المهنة' : 'مرفق: تسجيل العيادة في النقابة أو ترخيص العيادة'].join('\n');
+  return `<section class="card stack"><h2>التوثيق عن طريق واتساب</h2>
+    ${st === 'verified' ? '<div class="notice ok">حسابك موثّق ✓</div>' : '<p style="margin:0">ابعت لفريق DentaCore Shift على واتساب ورقة واحدة من دول:</p>'}
+    ${st === 'verified' ? '' : `<ul style="margin:0;padding-inline-start:20px">${docs.map(d => `<li>${d}</li>`).join('')}</ul>`}
+    ${num ? `<a class="btn ${st === 'verified' ? 'sec' : 'wa'} block" href="${esc(waHref(num, msg))}" target="_blank" rel="noopener">${icon.wa} ${st === 'verified' ? 'ابعت ورق متجدد' : 'ابعت ورقك على واتساب'}</a>`
+      : '<div class="notice">رقم واتساب التوثيق لسه بيتجهز. جرّب تاني بعد شوية.</div>'}
+    <p class="muted" style="margin:0">لما تبعت ورقك، تبقى موافق إن فريق DentaCore Shift يطّلع عليه ويراجعه علشان يوثّق حسابك، حسب <a href="#/privacy">سياسة الخصوصية</a>. فريقنا عمره ما هيطلب منك كلمة السر أو أي كود.</p></section>`;
+}
+const V = k => { const v = S.settings?.[k] ?? DEF[k]; return typeof v === 'number' ? v.toLocaleString('ar-EG') : esc(v); };
+const sec = (t, items) => `<section class="card stack"><h2>${t}</h2><ul style="margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px">${items.map(i => `<li>${i}</li>`).join('')}</ul></section>`;
+const contactLine = () => `واتساب الدعم: <span dir="ltr">${esc(S.settings?.support_whatsapp || LEGAL.whatsapp)}</span> · الإيميل: <span dir="ltr">${esc(LEGAL.email)}</span>`;
+const legalTitles = { terms:'شروط الاستخدام', privacy:'سياسة الخصوصية', refund:'سياسة الإلغاء والاسترداد', 'clinic-terms':'اتفاقية العيادات', 'rental-terms':'شروط الإيجار السنوي' };
+
+function legalBody(kind){
+  const H = V('cancel_free_hours');
+  if (kind === 'terms') return [
+    `<p style="margin:0">منصة «DentaCore Shift» (واسمها هنا «المنصة») في مرحلة تجريبية وتحت التأسيس، ويديرها ${esc(LEGAL.owner)} بصفته الشخصية كمسؤول عن المنصة، لحد ما تتأسس شركة تديرها. لما تستخدم المنصة تبقى موافق على الشروط دي، وعلى <a href="#/privacy">سياسة الخصوصية</a> و<a href="#/refund">سياسة الإلغاء والاسترداد</a>. ولو إنت صاحب عيادة، تبقى موافق كمان على <a href="#/clinic-terms">اتفاقية العيادات</a>. ولو استخدمت خدمة الإيجار السنوي، بتطبق عليك <a href="#/rental-terms">شروط الإيجار السنوي</a>.</p>`,
+    sec('١. طبيعة الخدمة', [
+      'المنصة وسيط تقني. بتوصّل أصحاب عيادات الأسنان المرخصة بأطباء أسنان عايزين يستخدموا عيادة مجهزة لفترة محددة (شيفت)، أو يأجّروا عيادة كاملة بعقد سنوي.',
+      'المنصة مش منشأة طبية، ومش بتقدم علاج، ومش بتتدخل في أي قرار طبي. ومش صاحب عمل للطبيب ولا للعيادة.',
+      'العلاقة المهنية بين الطبيب ومرضاه، وبين الطبيب والعيادة، مسؤولية أطرافها. وكلهم ملتزمين بقوانين مزاولة المهنة ولوائح نقابة أطباء الأسنان.']),
+    sec('٢. مين يقدر يستخدم المنصة', [
+      'الطبيب: طبيب أسنان مقيد في نقابة أطباء الأسنان، وكارنيهه ساري، ومسموح له يزاول المهنة.',
+      'العيادة: منشأة مرخصة يملكها أو يديرها طبيب أسنان، وترخيصها يسمح إن طبيب تاني يشتغل فيها.',
+      'لازم البيانات اللي بتسجلها تكون صحيحة وكاملة، وتحدّثها لو اتغيرت.',
+      'الحساب شخصي. إنت مسؤول عن كلمة السر، وعن أي حاجة بتتعمل من حسابك.']),
+    sec('٣. التوثيق', [
+      'التوثيق بيتم عن طريق واتساب: بتبعت مستنداتك من زرار «ابعت ورقك على واتساب» اللي جوه حسابك، على رقم المنصة المكتوب هناك بس. الطبيب (سواء بيحجز شيفت أو بيأجّر عيادة) بيبعت كارنيه النقابة أو ترخيص مزاولة المهنة. والعيادة (سواء بتعرض شيفتات أو بتعرض العيادة للإيجار) بتبعت شهادة تسجيلها في النقابة أو ترخيص العيادة.',
+      'لما تبعت مستنداتك، بتوافق إن فريق DentaCore Shift المسؤول عن التوثيق يطّلع عليها ويراجعها ويتأكد من صحتها، ويتحقق منها مع الجهات المختصة لو احتاج.',
+      'مفيش حجز ولا عرض شيفتات ولا طلبات إيجار قبل ما الحساب يتوثّق.',
+      'من حق المنصة ترفض أو توقف أي حساب لو المستندات ناقصة أو مش مطابقة، أو لو حصلت مخالفة للشروط.',
+      'أي تعديل في رقم القيد أو اسم العيادة بيرجّع الحساب للمراجعة تاني.',
+      'فريق المنصة عمره ما هيطلب منك كلمة السر أو أي كود بيوصلك. لو حد طلب منك كده، ما تدّيهوش وبلّغنا.',
+      'التوثيق معناه إن المستندات اتراجعت، ومش ضمان لمستوى الطبيب أو العيادة.']),
+    sec('٤. التزامات الطبيب', [
+      'يلتزم بمعاد الشيفت، ويبلّغ فورًا لو حصل أي ظرف.',
+      'مسؤول مهنيًا وقانونيًا عن تشخيص وعلاج مرضاه، وعن إنه ياخد موافقتهم المستنيرة.',
+      'يلتزم بقواعد مكافحة العدوى وبتعليمات العيادة الخاصة بالأجهزة والمكان، ويرجّع الأجهزة بنفس الحالة اللي استلمها بيها.',
+      'في نظام النسبة: يسجّل على المنصة كل مبلغ حصّله في الشيفت بدقة، من غير أسماء المرضى أو أي بيانات تعرّفهم. إخفاء أي دخل مخالفة جسيمة: بيتوقف الحساب، والطبيب ملزم يدفع الفرق.',
+      'أي صورة حالة بيرفعها لازم تكون بموافقة المريض، ومن غير وشه أو اسمه أو أي حاجة تعرّفه.',
+      'ممنوع يعرض على مرضى العيادة إنهم يتعالجوا عنده بره العيادة.']),
+    sec('٥. التزامات العيادة', [
+      'البيانات والصور والتجهيزات المعروضة لازم تكون صحيحة، والأجهزة سليمة وشغالة وقت الشيفت.',
+      'توفر التعقيم والمساعدة وكل اللي مكتوب إن الشيفت بيشمله.',
+      'ما تتدخلش في القرار الطبي للطبيب، وما تتعاملش مع مرضاه أو تغيّر خطة علاجهم من غير ما ترجع له.',
+      'تلتزم بـ <a href="#/clinic-terms">اتفاقية العيادات</a>.']),
+    sec('٦. الدفع', [
+      'كل المدفوعات بتمر عن طريق المنصة بس، بتحويل إنستاباي أو محفظة على البيانات المكتوبة جوه المنصة. المنصة مش مسؤولة عن أي مبلغ يتدفع بطريقة تانية أو لحساب تاني.',
+      `الحجز بيتأكد بعد ما المنصة تراجع التحويل. لو التحويل ما وصلش خلال ${V('hold_hours')} ساعات من الحجز، الحجز بيتلغي لوحده.`,
+      'السعر الثابت: الطبيب بيدفع سعر الشيفت كامل مقدمًا، وكل دخل مرضاه ليه.',
+      'نظام النسبة: الطبيب بيدفع الحد الأدنى مقدمًا. بعد الشيفت، لو نصيب العيادة طلع أكبر، بيدفع الفرق خلال 48 ساعة.',
+      'عمولة المنصة بتتخصم من نصيب العيادة. الطبيب مش بيدفع أي رسوم فوق السعر المعروض.',
+      'رسوم تحويل إنستاباي على اللي بيحوّل.',
+      `حساب إنستاباي والمحفظة المكتوبين في المنصة حساب شخصي باسم ${esc(LEGAL.owner)}، بصفته مسؤول المنصة، لحد ما الشركة تتأسس. الحساب ده بيستلم المدفوعات نيابة عن العيادات. نصيب كل عيادة أمانة عند المنصة، ومش جزء من دخلها، وبيتحوّل للعيادة في مواعيده.`,
+      'لما الشركة تتأسس، المدفوعات هتتحوّل لحساب باسمها، وهنبلّغك قبلها بـ 7 أيام على الأقل. والحقوق والالتزامات اللي في الشروط دي بتنتقل للشركة.',
+      'ما تحوّلش أي مبلغ لحساب غير المكتوب جوه المنصة، حتى لو حد طلب منك كده باسم المنصة.']),
+    sec('٧. عدم التجاوز', [
+      `لو طبيب وعيادة اتعرفوا على بعض من المنصة، كل الشيفتات بينهم لازم تتحجز عن طريق المنصة لمدة ${V('hire_protect_months')} شهور من آخر شيفت. ولو عايزين يتعاقدوا مباشرة خلال المدة دي، بيكون عن طريق «التعامل المباشر طويل الأمد» زي ما هو موضح في <a href="#/clinic-terms">اتفاقية العيادات</a>.`,
+      'ممنوع تستخدم بيانات التواصل اللي ظهرتلك من المنصة علشان تتفق مع الطرف التاني من وراها.']),
+    sec('٨. التقييمات', [
+      'كل طرف بيقيّم التاني بعد الشيفت. التقييم لازم يكون صادق، ومبني على تجربة حقيقية.',
+      'من حق المنصة تشيل أي تقييم فيه إساءة، أو بيانات شخصية، أو كلام مالوش علاقة بالشيفت.']),
+    sec('٩. ممنوع', [
+      'تسجيل بيانات أو مستندات مزيفة، أو انتحال شخصية حد تاني.',
+      'رفع صور تحويل مزيفة، أو التلاعب في الفواتير.',
+      'الإساءة أو التحرش أو التمييز ضد أي مستخدم.',
+      'أي محاولة لاختراق المنصة، أو للوصول لبيانات مش من حقك.']),
+    sec('١٠. حدود مسؤولية المنصة', [
+      'المنصة مش مسؤولة عن أي خطأ طبي، ولا عن نتيجة أي علاج، ولا عن العلاقة بين الطبيب ومرضاه.',
+      'المنصة بتحاول تحل الخلافات بين الطبيب والعيادة بشكل ودي. الخلافات المهنية بتتحال لنقابة أطباء الأسنان.',
+      'في كل الأحوال، المسؤولية المالية للمنصة ما تزيدش عن المبلغ اللي اتدفع لها في الحجز اللي عليه الخلاف.',
+      'المنصة ممكن تقف مؤقتًا للصيانة، أو لأسباب تقنية خارجة عن إرادتها.']),
+    sec('١١. إيقاف الحساب وقفله', [
+      'من حق المنصة توقف أو تلغي أي حساب بيخالف الشروط. أي مبلغ مستحق لصاحب الحساب بيتحوّل له بعد خصم اللي عليه.',
+      'تقدر تقفل حسابك في أي وقت عن طريق الدعم، بعد ما تسوّي أي حجوزات أو مبالغ لسه مفتوحة.']),
+    sec('١٢. تعديل الشروط', ['ممكن نعدّل الشروط دي. لو التعديل مهم، هنبلغك قبل ما يتطبق. ولو كمّلت استخدام المنصة بعدها، يبقى إنت موافق عليه.']),
+    sec('١٣. القانون والاختصاص', ['القانون المصري هو اللي بيطبق على الشروط دي. أي نزاع ما يتحلش وديًا خلال 30 يوم بيتحال لمحاكم القاهرة المختصة.']),
+    sec('١٤. التواصل', [contactLine()])
+  ].join('');
+
+  if (kind === 'privacy') return [
+    '<p style="margin:0">بنحترم خصوصيتك، وبنتعامل مع بياناتك حسب قانون حماية البيانات الشخصية رقم 151 لسنة 2020 ولائحته التنفيذية.</p>',
+    sec('١. البيانات اللي بنجمعها', [
+      '<strong>بيانات الحساب:</strong> الاسم، والإيميل، والموبايل، والمنطقة، ونوع الحساب.',
+      '<strong>بيانات التوثيق:</strong> صور المستندات اللي بتبعتها على واتساب. للطبيب: كارنيه النقابة أو ترخيص مزاولة المهنة، ورقم القيد، وسنة التخرج. وللعيادة: شهادة تسجيلها في النقابة أو ترخيصها، والعنوان، والصور.',
+      '<strong>بيانات الإيجار السنوي:</strong> بيانات إعلان العيادة وعنوانها وصورها، وطلبات المعاينة، وقيمة الإيجار في العقد النهائي علشان نحسب العمولة.',
+      '<strong>بيانات الحجز والدفع:</strong> الحجوزات، وأرقام عمليات التحويل وصورها، وحساب إنستاباي أو المحفظة اللي بنحوّل ونرجّع عليه الفلوس، وفواتير الشيفت (العلاج والمبلغ بس).',
+      '<strong>الملف المهني:</strong> التخصصات، والنبذة، وصور الحالات، والتقييمات.',
+      '<strong>بيانات تقنية:</strong> سجلات تسجيل الدخول اللازمة لتأمين حسابك.']),
+    sec('٢. بنستخدمها في إيه', [
+      'نتأكد من هوية المستخدم ومن الترخيص.',
+      'ننفّذ الحجوزات والمدفوعات والتسويات.',
+      'نحل الخلافات ونمنع الاحتيال.',
+      'نتواصل معاك بخصوص حسابك وحجوزاتك.',
+      'نلتزم بالقانون وبالضرايب.']),
+    sec('٣. مين يشوف إيه', [
+      'اسمك، ومنطقتك، وتخصصاتك، وتقييماتك، وصور الحالات أو العيادة: بيشوفها المستخدمين المسجلين في المنصة.',
+      'رقم الموبايل وعنوان العيادة بالتفصيل: بيشوفهم الطرف التاني في الحجز المؤكد بس، ومن يوم قبل الشيفت.',
+      'فواتير الشيفت: بيشوفها الطبيب والعيادة اللي في الحجز، وفريق المنصة.',
+      'مستندات التوثيق، وصور التحويلات، وأرقام الحسابات: بيشوفها فريق المنصة المسؤول بس.',
+      'في الإيجار السنوي: رقم المالك والمستأجر وعنوان العيادة بالتفصيل بيشوفهم فريق المنصة بس. بنديهم للطرف التاني لما نرتب المعاينة أو الإمضاء، بعد موافقتك.']),
+    sec('٤. مش بنبيع بياناتك', ['مش بنبيع بياناتك ولا بنأجّرها لأي حد، ومش بنبعتلك رسايل دعاية غير بموافقتك.']),
+    sec('٥. أماكن الاستضافة', [
+      'بياناتك متخزنة عند مزودي خدمات سحابية: Supabase لقاعدة البيانات والملفات، وCloudflare لاستضافة الموقع. ممكن تكون السيرفرات دي بره مصر، والاتصال بيها مشفّر.',
+      'مستندات التوثيق والتواصل معاك بيتموا على واتساب (تبع شركة Meta)، والرسايل فيه مشفّرة.',
+      'لما تستخدم المنصة، تبقى موافق إن بياناتك تتنقل وتتخزن بالشكل ده.']),
+    sec('٦. بيانات المرضى', [
+      'المنصة مش بتطلب ولا بتخزن أسماء المرضى أو ملفاتهم الطبية.',
+      'الطبيب ممنوع يكتب أي بيانات تعرّف المريض في الفواتير. وهو المسؤول إنه ياخد موافقة المريض على أي صورة بيرفعها.']),
+    sec('٧. بنحتفظ بالبيانات لحد إمتى', [
+      'صور مستندات التوثيق اللي على واتساب: بنمسحها من المحادثة خلال 30 يوم من مراجعتها، وبنحتفظ بس بنتيجة المراجعة ورقم القيد أو الترخيص.',
+      'بيانات الحساب: طول ما الحساب شغال. ولما الحساب يتقفل، بنمسحها خلال 90 يوم.',
+      'السجلات المالية وسجلات الحجوزات: بنحتفظ بيها 5 سنين علشان الالتزامات القانونية والضريبية.']),
+    sec('٨. إزاي بنحمي البيانات', [
+      'الاتصال مشفّر.',
+      'كل مستخدم بيوصل لبياناته بس، وده متطبق جوه قاعدة البيانات نفسها مش في الموقع بس.',
+      'مستندات التوثيق والتحويلات متخزنة في مكان خاص مش متاح للعامة، والروابط بتاعتها بتنتهي بعد دقايق.',
+      'لو حصل اختراق، بنبلّغ الجهات المختصة والمستخدمين المتأثرين في المواعيد اللي القانون بيحددها.']),
+    sec('٩. حقوقك', [
+      'تعرف البيانات اللي عندنا عنك، وتاخد نسخة منها.',
+      'تصحّحها أو تحدّثها.',
+      'تطلب نمسحها، في حدود الالتزامات القانونية.',
+      'تسحب موافقتك. وده ممكن يخليك ما تقدرش تستخدم المنصة.',
+      'تشتكي لمركز حماية البيانات الشخصية.',
+      'اطلب أي حق من دول عن طريق الدعم، وهنرد عليك في المواعيد اللي القانون بيحددها.']),
+    sec('١٠. لمين المنصة', ['المنصة لأطباء الأسنان وأصحاب العيادات بس، ومش معمولة لحد أقل من 18 سنة.',
+      `المسؤول عن بياناتك دلوقتي هو ${esc(LEGAL.owner)}، بصفته مسؤول المنصة. ولما الشركة تتأسس، البيانات هتنتقل لها بنفس مستوى الحماية، وهنبلّغك بده.`]),
+    sec('١١. التعديلات والتواصل', ['لو عدّلنا السياسة دي تعديل مهم، هنبلغك.', contactLine()])
+  ].join('');
+
+  if (kind === 'refund') return [
+    `<p style="margin:0">القواعد دي بتطبق على كل الحجوزات. المبالغ اللي بترجع بتتحوّل على حساب إنستاباي أو المحفظة المسجل في ملفك خلال 3 أيام عمل، فاتأكد إن بياناتك صح.</p>`,
+    sec('لو الطبيب لغى', [
+      `قبل الشيفت بـ ${H} ساعة أو أكتر: بيرجعله المبلغ كامل.`,
+      `قبل الشيفت بأقل من ${H} ساعة، أو ما حضرش: مش بيرجعله حاجة. المبلغ بيروح للعيادة تعويض، بعد خصم عمولة المنصة.`,
+      'الحجز اللي لسه مستني التحويل بيتلغي من غير أي رسوم.']),
+    sec('لو العيادة لغت أو حصلت مشكلة فيها', [
+      'العيادة لغت حجز مؤكد في أي وقت: بيرجع للطبيب المبلغ كامل.',
+      'تكرار الإلغاء من العيادة بيأثر على تقييمها، وممكن يوقف حسابها.',
+      'العيادة ما قدرتش تستقبل الطبيب، أو الأجهزة الأساسية مش شغالة لدرجة إن الشيفت ما ينفعش: الطبيب يبلّغ الدعم في نفس اليوم، وبعد ما نتأكد بيرجعله المبلغ كامل.']),
+    sec('حالات تانية', [
+      'التحويل وصل بعد ما مهلة الحجز خلصت، أو بعد ما الشيفت اتحجز لحد تاني: بيرجع كامل.',
+      'نظام النسبة: الحد الأدنى اللي اتدفع مقدمًا ليه نفس القواعد. الفرق اللي بيطلع بعد الشيفت لازم يتدفع خلال 48 ساعة، وإلا الحساب بيتوقف لحد التسوية.',
+      'عمولة التعريف في «التعامل المباشر طويل الأمد» مش بترجع بعد ما تتأكد.']),
+    sec('الاعتراض', ['لو عندك أي اعتراض، ابعته للدعم خلال 48 ساعة من الشيفت ومعاه التفاصيل.', contactLine()])
+  ].join('');
+
+  if (kind === 'clinic-terms') return [
+    '<p style="margin:0">الاتفاقية دي بين المنصة وصاحب العيادة المسجل، وبتكمّل <a href="#/terms">شروط الاستخدام</a>. لما تسجل كعيادة تبقى موافق عليها.</p>',
+    sec('١. الترخيص والمسؤولية', [
+      'العيادة مرخصة، وصاحبها أو مديرها الطبي هو المسؤول قدام الجهات المختصة عن المنشأة.',
+      'العيادة مسؤولة إن استقبالها للطبيب الزائر يكون في حدود ترخيصها.']),
+    sec('٢. عمولة المنصة', [
+      `السعر الثابت: ${V('commission_fixed_pct')}% من سعر الشيفت.`,
+      `نظام النسبة: ${V('commission_percent_pct')}% من دخل الشيفت، وأقل عمولة ${V('commission_min')} جنيه للشيفت.`,
+      `العمولة ليها سقف: ${V('monthly_cap_pair')} جنيه في الشهر لنفس الطبيب في نفس العيادة.`,
+      'العمولة بتتخصم من نصيب العيادة. والنسب المطبقة على أي حجز هي النسب المعلنة وقت الحجز.']),
+    sec('٣. تحويل نصيب العيادة', [
+      'المنصة بتحوّل الرصيد المستحق كل أسبوع، على حساب إنستاباي أو المحفظة المسجل في بيانات العيادة.',
+      'الرصيد، واللي اتحوّل منه، ظاهرين في لوحة العيادة.',
+      `لحد ما الشركة تتأسس، المدفوعات بتتحوّل على حساب شخصي باسم ${esc(LEGAL.owner)}، بصفته مسؤول المنصة. نصيب العيادة أمانة عنده لحد ما يتحوّل لها، والتفاصيل في <a href="#/terms">شروط الاستخدام</a> (بند الدفع).`]),
+    sec('٤. التعامل المباشر طويل الأمد وعدم التجاوز', [
+      `لو العيادة عايزة تشغّل طبيب اتعرفت عليه من المنصة بأي شكل مباشر بره المنصة (شيفتات بانتظام، أو شغل جزئي، أو دائم) خلال ${V('hire_protect_months')} شهور من آخر شيفت بينهم، بيتحوّل التعامل لـ «تعامل مباشر طويل الأمد». والمنصة بتاخد مقابله «عمولة تعريف» مرة واحدة، لأنها هي اللي عرّفتهم ببعض.`,
+      `عمولة التعريف ${V('hire_fee')} جنيه، بيتخصم منها العمولات اللي العيادة دفعتها قبل كده على شيفتات نفس الطبيب، بحيث ما تقلش عن ${V('hire_min')} جنيه. الطبيب مش بيدفع أي حاجة.`,
+      'الطلب والدفع بيتعملوا من زرار «التعامل المباشر» في تفاصيل الحجز.',
+      'لو اتضح إن العيادة اتعاملت مع الطبيب مباشرة من غير ما تدفع عمولة التعريف، بتستحق عليها العمولة كاملة من غير خصم، ومن حق المنصة توقف حسابها.']),
+    sec('٥. الإلغاء والجودة', [
+      'لو العيادة لغت حجز مؤكد، الطبيب بياخد فلوسه كاملة. ولو اتكرر الإلغاء 3 مرات في نفس الشهر، ممكن حساب العيادة يتوقف.',
+      'العيادة بتحتفظ بسجل للتعقيم. ولو طبيب اشتكى من التجهيزات أو التعقيم واتأكدنا إن الشكوى صحيحة، الطبيب بياخد فلوسه كاملة.']),
+    sec('٦. المدة والإنهاء', [
+      'الاتفاقية سارية طول ما حساب العيادة شغال.',
+      'تقدر تنهيها بإشعار للدعم، بعد ما تسوّي أي حجوزات مفتوحة.',
+      `بند عدم التجاوز بيفضل ساري ${V('hire_protect_months')} شهور بعد الإنهاء.`]),
+    sec('٧. الإيجار السنوي', ['لو عرضت عيادتك للإيجار السنوي، بتطبق عليك <a href="#/rental-terms">شروط الإيجار السنوي</a>.']),
+    sec('٨. التواصل', [contactLine()])
+  ].join('');
+
+  if (kind === 'rental-terms') return [
+    '<p style="margin:0">الشروط دي بتطبق على خدمة الإيجار السنوي للعيادات، وبتكمّل <a href="#/terms">شروط الاستخدام</a>. لما تعرض عيادة للإيجار أو تطلب معاينة، تبقى موافق عليها.</p>',
+    sec('١. طبيعة الخدمة', [
+      'المنصة بتعرض عيادات أسنان للإيجار السنوي، وبتوفّق بين المالك والمستأجر، وبترتب المعاينات والتفاوض لحد إمضاء العقد.',
+      'المنصة مش طرف في عقد الإيجار، ومش ضامنة لأي طرف. العقد وشروطه وتنفيذه مسؤولية المالك والمستأجر.',
+      'ننصح كل طرف يراجع العقد مع محامي قبل ما يمضي.']),
+    sec('٢. مدة العقد', [`أقل مدة لعقد الإيجار ${V('rental_min_months')} شهر.`]),
+    sec('٣. التواصل عن طريق المنصة', [
+      'كل التواصل بين المالك والمستأجر بيكون عن طريق فريق DentaCore Shift لحد إمضاء العقد.',
+      'رقم الموبايل والعنوان بالتفصيل مش بيظهروا للطرف التاني. فريق المنصة هو اللي بيرتب المعاينة والمقابلات، وبيوصّل العروض بين الطرفين.',
+      'ممنوع أي طرف يحاول يوصل للتاني مباشرة، أو عن طريق حد تاني، قبل الإمضاء.']),
+    sec('٤. العمولة', [
+      `عمولة المنصة ${DV('rental_commission_months') === 1 ? 'إيجار شهر واحد' : V('rental_commission_months') + ' شهور إيجار'}، محسوبة على الإيجار الشهري المكتوب في العقد النهائي. ولو الإيجار بيزيد خلال مدة العقد، بتتحسب على إيجار أول شهر.`,
+      `العمولة بتتقسم: ${V('rental_tenant_pct')}% على المستأجر، و${(100 - DV('rental_tenant_pct')).toLocaleString('ar-EG')}% على المالك.`,
+      `العمولة بتستحق عند إمضاء العقد، وبتتدفع يوم الإمضاء بتحويل إنستاباي أو محفظة على بيانات المنصة. ولحد ما الشركة تتأسس، الحساب ده شخصي باسم ${esc(LEGAL.owner)}، بصفته مسؤول المنصة.`,
+      'العمولة مش بترجع بعد الإمضاء، حتى لو العقد اتفسخ بعد كده.',
+      'مفيش أي رسوم لو العقد ما اتمضاش.']),
+    sec('٥. عدم التجاوز', [
+      `لو المالك والمستأجر اتعاقدوا من غير المنصة خلال ${V('rental_protect_months')} شهر من تاريخ تعريفهم ببعض عن طريقها، على نفس العيادة أو أي عيادة تانية للمالك، كل طرف بيلتزم يدفع نصيبه من العمولة كأن العقد اتم عن طريق المنصة.`,
+      'تاريخ التعريف هو أول مرة فريق المنصة يرتب فيها تواصل أو معاينة بين الطرفين.',
+      'ومن حق المنصة كمان توقف حساب أي طرف يخالف البند ده.']),
+    sec('٦. التزامات المالك', [
+      'يكون مالك العيادة، أو مفوّض قانونيًا إنه يأجّرها، وحسابه موثّق بتسجيل العيادة في النقابة أو ترخيصها.',
+      'البيانات والصور والسعر اللي في الإعلان صحيحة.',
+      'يبلّغ المنصة فورًا لو العيادة اتأجرت أو بقت مش متاحة.']),
+    sec('٧. التزامات المستأجر', [
+      'يكون طبيب أسنان موثّق على المنصة بكارنيه النقابة أو ترخيص مزاولة المهنة.',
+      'يتأكد بنفسه من حالة العيادة وأجهزتها ومستنداتها قبل الإمضاء.',
+      'ترخيص مزاولة النشاط في العيادة باسمه، أو نقل الترخيص، مسؤوليته هو والمالك حسب القانون.']),
+    sec('٨. مراجعة الإعلانات', ['فريق المنصة بيراجع كل إعلان قبل ما ينشره، ومن حقه يرفض أو يوقف أي إعلان مخالف أو بيانات غير صحيحة.']),
+    sec('٩. التواصل', [contactLine()])
+  ].join('');
+}
+
+function viewLegal(kind){
+  shell(`<a href="#/">→ الرئيسية</a>
+    <h1>${legalTitles[kind]}</h1><p class="muted" style="margin:0">آخر تحديث: ${esc(LEGAL.updated)}</p>
+    ${legalBody(kind)}`, '');
+  window.scrollTo(0, 0);
+}
+const legalLinks = () => `<footer style="padding:20px 16px 8px;text-align:center;font-size:12px;color:var(--muted);display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+  ${Object.entries(legalTitles).map(([k,t]) => `<a href="#/${k}" style="color:var(--muted)">${t}</a>`).join('')}</footer>`;
+
+/* ---------- الهيكل ---------- */
+function shell(body, active){
+  const r = S.me?.role;
+  const links = r === 'doctor' ? [['#/shifts','شيفتات','search'],['#/bookings','حجوزاتي','cal'],['#/rentals','إيجار سنوي','key'],['#/profile','ملفي','user']]
+    : r === 'clinic' ? [['#/clinic','عيادتي','home'],['#/clinic/new','شيفت جديد','plus'],['#/clinic/rentals','إيجار سنوي','key'],['#/clinic/edit','البيانات','user']]
+    : r === 'admin' ? [['#/admin','الإدارة','shield']] : [];
+  app.innerHTML = `
+    <header class="top"><a class="brand" href="#/" aria-label="DentaCore Shift"><span class="logo">${MARK}</span><span class="bname"><small>DENTACORE</small><b>Shift</b></span></a>
+      ${S.session ? '<button class="btn sec" id="logout" style="min-height:40px">خروج</button>' : ''}</header>
+    <main>${body}</main>
+    ${legalLinks()}
+    ${links.length ? `<nav class="bottom" aria-label="التنقل الرئيسي"><div class="in">${links.map(([h,t,i]) =>
+      `<a href="${h}" ${active === h ? 'aria-current="page"' : ''}>${icon[i]}${t}</a>`).join('')}</div></nav>` : ''}`;
+  $('logout')?.addEventListener('click', async () => { await sb.auth.signOut(); location.hash = '#/'; });
+}
+const loading = () => { app.querySelector('main') ? app.querySelector('main').innerHTML = '<div class="spin">جاري التحميل…</div>' : null; };
+
+async function loadMe(){
+  S.me = S.doctor = S.clinic = null;
+  if (!S.session) return;
+  const uid = S.session.user.id;
+  S.me = must(await sb.from('profiles').select('*').eq('id', uid).single());
+  S.contact = (await sb.from('contacts').select('*').eq('user_id', uid).maybeSingle()).data || {};
+  if (S.me.role === 'doctor') S.doctor = must(await sb.from('doctors').select('*').eq('id', uid).single());
+  if (S.me.role === 'clinic') S.clinic = (await sb.from('clinics').select('*').eq('owner_id', uid).maybeSingle()).data;
+  const st = must(await sb.from('settings').select('*'));
+  S.settings = Object.fromEntries(st.map(x => [x.key, x.value]));
+}
+
+/* ---------- الدخول والتسجيل ---------- */
+function viewAuth(mode = 'login'){
+  shell(`
+    <div class="card stack">
+      <h1>${mode === 'login' ? 'تسجيل الدخول' : 'حساب جديد'}</h1>
+      <p class="muted" style="margin:0">منصة لحجز شيفتات في عيادات أسنان مجهزة، ولأصحاب العيادات اللي عندهم كراسي فاضية.</p>
+      ${mode === 'signup' ? `
+        <div><span class="muted">أنا</span>
+          <div class="seg" role="group" aria-label="نوع الحساب">
+            <button type="button" id="r-doc" aria-pressed="true">طبيب بدوّر على شيفت</button>
+            <button type="button" id="r-cl" aria-pressed="false">صاحب عيادة</button>
+          </div></div>
+        <div><label for="f-name">الاسم بالكامل</label><input id="f-name" autocomplete="name" maxlength="80"></div>
+        <div class="grid2">
+          <div><label for="f-phone">الموبايل</label><input id="f-phone" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx"></div>
+          <div><label for="f-area">المنطقة</label><input id="f-area" placeholder="مدينة نصر" maxlength="80"></div>
+        </div>` : ''}
+      <div><label for="f-email">الإيميل</label><input id="f-email" type="email" autocomplete="email" dir="ltr"></div>
+      <div><label for="f-pass">كلمة السر</label><input id="f-pass" type="password" autocomplete="${mode === 'login' ? 'current-password' : 'new-password'}" dir="ltr" minlength="8"></div>
+      ${mode === 'signup' ? `<label style="display:flex;gap:10px;align-items:flex-start;color:var(--ink);font-size:14px">
+        <input type="checkbox" id="f-terms" style="width:22px;min-height:22px;margin-top:2px;flex:none">
+        <span>قرأت ووافقت على <a href="#/terms" target="_blank">شروط الاستخدام</a> و<a href="#/privacy" target="_blank">سياسة الخصوصية</a> و<a href="#/refund" target="_blank">سياسة الإلغاء والاسترداد</a><span id="f-clt" hidden> و<a href="#/clinic-terms" target="_blank">اتفاقية العيادات</a></span>، وموافق إن فريق DentaCore Shift يطّلع على المستندات اللي هبعتها علشان يوثّق حسابي.</span></label>` : ''}
+      <button class="btn block" id="go">${mode === 'login' ? 'دخول' : 'إنشاء الحساب'}</button>
+      <div class="between">
+        <a href="#/${mode === 'login' ? 'signup' : 'login'}">${mode === 'login' ? 'معنديش حساب' : 'عندي حساب'}</a>
+        ${mode === 'login' ? '<button class="btn sec" id="forgot" style="min-height:40px">نسيت كلمة السر</button>' : ''}
+      </div>
+    </div>`);
+  let role = 'doctor';
+  if (mode === 'signup'){
+    $('r-doc').onclick = () => { role = 'doctor'; $('r-doc').setAttribute('aria-pressed','true'); $('r-cl').setAttribute('aria-pressed','false'); $('f-clt').hidden = true; };
+    $('r-cl').onclick  = () => { role = 'clinic'; $('r-cl').setAttribute('aria-pressed','true'); $('r-doc').setAttribute('aria-pressed','false'); $('f-clt').hidden = false; };
+  }
+  $('go').onclick = e => run(e.target, async () => {
+    const email = $('f-email').value.trim(), password = $('f-pass').value;
+    if (mode === 'login'){
+      must(await sb.auth.signInWithPassword({ email, password }));
+    } else {
+      const full_name = $('f-name').value.trim(), phone = $('f-phone').value.replace(/[^0-9+]/g,''), area = $('f-area').value.trim();
+      if (full_name.length < 2) throw new Error('اكتب اسمك');
+      if (!/^\+?[0-9]{8,15}$/.test(phone)) throw new Error('رقم الموبايل غير صحيح');
+      if (password.length < 8) throw new Error('كلمة السر لازم تكون 8 حروف على الأقل');
+      if (!$('f-terms').checked) throw new Error('لازم توافق على الشروط والسياسات الأول');
+      const r = must(await sb.auth.signUp({ email, password, options:{ data:{ role, full_name, phone, area, terms_version:LEGAL.version } } }));
+      if (!r.session) { toast('اتبعتلك رسالة تأكيد على الإيميل، افتحها وبعدين ادخل'); location.hash = '#/login'; }
+    }
+  });
+  $('forgot')?.addEventListener('click', e => run(e.target, async () => {
+    const email = $('f-email').value.trim(); if (!email) throw new Error('اكتب إيميلك الأول');
+    must(await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname + '#/reset' }));
+    toast('اتبعتلك رابط تغيير كلمة السر');
+  }));
+}
+function viewReset(){
+  shell(`<div class="card stack"><h1>كلمة سر جديدة</h1>
+    <div><label for="np">كلمة السر الجديدة</label><input id="np" type="password" dir="ltr" minlength="8"></div>
+    <button class="btn block" id="save">حفظ</button></div>`);
+  $('save').onclick = e => run(e.target, async () => {
+    must(await sb.auth.updateUser({ password: $('np').value })); toast('اتغيرت'); location.hash = '#/';
+  });
+}
+
+/* ---------- الطبيب ---------- */
+async function viewShifts(){
+  shell('<div class="spin">جاري التحميل…</div>', '#/shifts');
+  const f = JSON.parse(sessionStorage.getItem('flt') || '{}');
+  let q = sb.from('shifts').select('*, clinics(name, area, equipment, photo_paths)').eq('status','open')
+    .order('shift_date').order('start_time').limit(60);
+  if (f.mode) q = q.eq('mode', f.mode);
+  if (f.date) q = q.eq('shift_date', f.date);
+  let rows = must(await q);
+  if (f.area) rows = rows.filter(s => (s.clinics?.area || '').includes(f.area));
+  const d = S.doctor;
+  app.querySelector('main').innerHTML = `
+    <div><p class="muted" style="margin:0">أهلًا د. ${esc(S.me.full_name)}</p><h1>شيفتات متاحة</h1></div>
+    ${d.status !== 'verified' ? `<div class="notice">${d.status === 'rejected' ? 'ملفك اترفض: ' + esc(d.reject_reason || '') + ' — كلّمنا على واتساب من «ملفي».' : 'تقدر تتفرج دلوقتي، والحجز بيتفتح بعد ما ملفك يتوثّق.'} <a href="#/profile">ابعت ورقك على واتساب</a></div>` : ''}
+    <div class="card stack">
+      <div class="grid2">
+        <div><label for="fa">المنطقة</label><input id="fa" value="${esc(f.area || '')}" placeholder="أي منطقة"></div>
+        <div><label for="fd">اليوم</label><input id="fd" type="date" value="${esc(f.date || '')}"></div>
+      </div>
+      <div><label for="fm">طريقة الدفع</label><select id="fm"><option value="">الكل</option>
+        <option value="fixed" ${f.mode === 'fixed' ? 'selected' : ''}>سعر ثابت</option>
+        <option value="percent" ${f.mode === 'percent' ? 'selected' : ''}>نسبة من الدخل</option></select></div>
+      <button class="btn sec" id="apply">بحث</button>
+    </div>
+    ${rows.length ? rows.map(s => `
+      <article class="card stack">
+        <div class="between"><div><strong>${esc(s.clinics?.name)} — ${esc(s.clinics?.area)}</strong>
+          <div class="muted">${dateAr(s.shift_date)} · ${timeAr(s.start_time)} – ${timeAr(s.end_time)}</div></div>
+          <span class="chip ok">عيادة موثّقة</span></div>
+        <div class="row">${(s.includes.length ? s.includes : s.clinics?.equipment || []).slice(0,5).map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
+        <div class="between"><div><div class="price">${priceText(s)}</div><div class="muted">${modeText(s)}</div></div>
+          <a class="btn" href="#/shift/${s.id}">التفاصيل</a></div>
+      </article>`).join('') : '<div class="card muted">مفيش شيفتات بالبحث ده دلوقتي. جرّب يوم أو منطقة تانية.</div>'}`;
+  $('apply').onclick = () => { sessionStorage.setItem('flt', JSON.stringify({ area:$('fa').value.trim(), date:$('fd').value, mode:$('fm').value })); viewShifts(); };
+}
+
+async function viewShift(id){
+  shell('<div class="spin">جاري التحميل…</div>', '#/shifts');
+  const s = (await sb.from('shifts').select('*, clinics(id, name, area, equipment, photo_paths, owner_id)').eq('id', id).maybeSingle()).data;
+  if (!s) { app.querySelector('main').innerHTML = '<div class="card">الشيفت ده مش متاح.</div>'; return; }
+  const revs = (await sb.from('reviews').select('rating').eq('target_id', s.clinics.owner_id)).data || [];
+  const avg = revs.length ? (revs.reduce((a,r) => a + r.rating, 0) / revs.length).toFixed(1) : null;
+  const inc = s.includes.length ? s.includes : s.clinics.equipment;
+  app.querySelector('main').innerHTML = `
+    <a href="#/shifts">→ رجوع</a>
+    <section class="card stack">
+      ${s.clinics.photo_paths?.length ? `<div class="thumbs">${s.clinics.photo_paths.slice(0,3).map(p => `<img src="${esc(mediaUrl(p))}" alt="صورة العيادة" loading="lazy">`).join('')}</div>` : ''}
+      <div class="between"><h1 style="font-size:18px">${esc(s.clinics.name)} — ${esc(s.clinics.area)}</h1><span class="chip ok">موثّقة</span></div>
+      <div class="muted">${dateAr(s.shift_date)} · ${timeAr(s.start_time)} – ${timeAr(s.end_time)}</div>
+      <div class="muted">${avg ? `تقييم الأطباء: ${avg} من 5 (${revs.length})` : 'لسه مفيش تقييمات'}</div>
+    </section>
+    <section class="card"><h2>الشيفت يشمل</h2><div class="row">${inc.map(t => `<span class="chip">${esc(t)}</span>`).join('') || '<span class="muted">مش محدد</span>'}</div>
+      ${s.notes ? `<p class="muted">${esc(s.notes)}</p>` : ''}
+      <p class="muted" style="margin-bottom:0">العنوان بالتفصيل ورقم العيادة بيظهروا بعد تأكيد الحجز، من يوم قبل الشيفت.</p></section>
+    <section class="card stack"><h2>الدفع</h2>
+      <div class="price">${priceText(s)}</div><div class="muted">${modeText(s)}</div>
+      <p class="muted" style="margin:0">${s.mode === 'fixed'
+        ? 'بتحوّل المبلغ مقدمًا بإنستاباي، وكل دخل مرضاك ليك.'
+        : `بتحوّل الحد الأدنى (${money(s.min_guarantee)}) مقدمًا. بعد الشيفت بتسجّل الفواتير، ولو نصيب العيادة طلع أكتر بتحوّل الفرق.`}</p>
+      <p class="muted" style="margin:0">الإلغاء مجاني قبل الشيفت بـ ${esc(S.settings.cancel_free_hours)} ساعة، والمبلغ يرجعلك.</p>
+      <button class="btn block" id="book" ${S.doctor.status !== 'verified' ? 'disabled' : ''}>${S.doctor.status !== 'verified' ? 'الحجز بعد توثيق ملفك' : 'احجز الشيفت'}</button>
+    </section>`;
+  $('book').onclick = e => run(e.target, async () => {
+    const bid = must(await sb.rpc('book_shift', { p_shift: id }));
+    toast('اتحجزلك الشيفت مؤقتًا، كمّل التحويل'); location.hash = '#/booking/' + bid;
+  });
+}
+
+async function myBookings(){
+  return must(await sb.from('bookings').select('*, shifts(*, clinics(name, area))').order('created_at', { ascending:false }).limit(100));
+}
+async function viewBookings(){
+  shell('<div class="spin">جاري التحميل…</div>', '#/bookings');
+  const rows = await myBookings();
+  app.querySelector('main').innerHTML = `<h1>حجوزاتي</h1>` + (rows.length ? rows.map(b => `
+    <a class="card stack" style="text-decoration:none;color:inherit" href="#/booking/${b.id}">
+      <div class="between"><strong>${esc(b.shifts.clinics.name)} — ${esc(b.shifts.clinics.area)}</strong>${chip(b.status)}</div>
+      <div class="muted">${dateAr(b.shifts.shift_date)} · ${timeAr(b.shifts.start_time)} – ${timeAr(b.shifts.end_time)}</div>
+    </a>`).join('') : '<div class="card muted">لسه ما حجزتش شيفتات. <a href="#/shifts">دوّر على شيفت</a></div>');
+}
+
+function payBox(amount, idPrefix, note){
+  return `<div class="card stack">
+    <h2>حوّل ${money(amount)} بإنستاباي</h2>
+    <div>عنوان الدفع: <strong dir="ltr">${esc(S.settings.instapay_address)}</strong></div>
+    <div>أو محفظة: <strong dir="ltr">${esc(S.settings.wallet_number)}</strong></div>
+    ${note ? `<div class="notice">${esc(note)}</div>` : ''}
+    <div><label for="${idPrefix}-ref">رقم العملية (المرجع) من إنستاباي</label><input id="${idPrefix}-ref" dir="ltr" maxlength="60"></div>
+    <div><label for="${idPrefix}-file">صورة التحويل</label><input id="${idPrefix}-file" type="file" accept="image/*,application/pdf"></div>
+    <button class="btn block" id="${idPrefix}-send">بعت التحويل للمراجعة</button>
+  </div>`;
+}
+
+async function viewBooking(id){
+  shell('<div class="spin">جاري التحميل…</div>', '#/bookings');
+  const b = (await sb.from('bookings').select('*, shifts(*, clinics(name, area, owner_id))').eq('id', id).maybeSingle()).data;
+  if (!b) { app.querySelector('main').innerHTML = '<div class="card">الحجز غير موجود.</div>'; return; }
+  const s = b.shifts;
+  const inv = s.mode === 'percent' ? must(await sb.from('invoices').select('*').eq('booking_id', id).order('created_at')) : [];
+  const total = inv.reduce((a,x) => a + x.amount, 0);
+  const contact = ['confirmed','settlement_due','settlement_review'].includes(b.status) ? ((await sb.rpc('booking_contact', { p_booking:id })).data || [])[0] : null;
+  const reviewed = (await sb.from('reviews').select('id').eq('booking_id', id).eq('author_id', S.session.user.id)).data?.length;
+  const started = new Date(`${s.shift_date}T${s.start_time}+02:00`) <= new Date();
+  let body = `<a href="#/bookings">→ حجوزاتي</a>
+    <section class="card stack"><div class="between"><strong>${esc(s.clinics.name)} — ${esc(s.clinics.area)}</strong>${chip(b.status)}</div>
+      <div class="muted">${dateAr(s.shift_date)} · ${timeAr(s.start_time)} – ${timeAr(s.end_time)}</div>
+      <div><span class="price">${priceText(s)}</span> <span class="muted">${modeText(s)}</span></div></section>`;
+  if (b.status === 'pending_payment') body += `<div class="notice">لازم تحوّل قبل ${dtAr(b.hold_expires_at)}، وإلا الحجز بيتلغي لوحده.</div>` + payBox(b.amount_due, 'p', b.admin_note);
+  if (b.status === 'payment_review') body += `<div class="card notice ok">استلمنا رقم العملية وبنراجعه. هيوصلك التأكيد هنا.</div>`;
+  if (['confirmed','settlement_due','settlement_review'].includes(b.status)) {
+    body += contact ? `<section class="card stack"><h2>بيانات العيادة</h2>
+        <div>العنوان: ${esc(contact.address || '—')}</div>
+        ${contact.map_link ? `<a href="${esc(contact.map_link)}" target="_blank" rel="noopener">فتح الخريطة</a>` : ''}
+        ${contact.clinic_phone ? `<a class="btn sec" href="tel:${esc(contact.clinic_phone)}">اتصال بالعيادة</a>` : ''}</section>`
+      : `<div class="card muted">العنوان ورقم العيادة بيظهروا هنا من يوم قبل الشيفت.</div>`;
+  }
+  if (b.status === 'confirmed' && s.mode === 'percent') body += `
+    <section class="card stack"><h2>فواتير الشيفت</h2>
+      <p class="muted" style="margin:0">سجّل كل علاج عملته في الشيفت. نصيب العيادة ${Number(s.percent).toLocaleString('ar-EG')}% بحد أدنى ${money(s.min_guarantee)}. ما تكتبش أسماء المرضى.</p>
+      ${inv.length ? `<table><tbody>${inv.map(x => `<tr><td>${esc(x.procedure)}</td><td>${money(x.amount)}</td><td><button class="btn bad" data-del="${x.id}" style="min-height:36px">حذف</button></td></tr>`).join('')}</tbody></table>
+        <div class="between"><strong>الإجمالي</strong><strong>${money(total)}</strong></div>` : ''}
+      <div class="grid2"><div><label for="iv-p">العلاج</label><input id="iv-p" maxlength="80" placeholder="حشو عصب"></div>
+        <div><label for="iv-a">المبلغ</label><input id="iv-a" type="number" inputmode="numeric" min="1"></div></div>
+      <button class="btn sec" id="iv-add">إضافة فاتورة</button></section>`;
+  if (b.status === 'confirmed') body += `<div class="stack">
+      <button class="btn block" id="finish" ${started ? '' : 'disabled'}>${started ? 'الشيفت خلص' : 'زرار إنهاء الشيفت بيتفعّل لما يبدأ'}</button>
+      <button class="btn bad block" id="cancel">إلغاء الحجز</button></div>`;
+  if (b.status === 'pending_payment' || b.status === 'payment_review') body += `<button class="btn bad block" id="cancel">إلغاء الحجز</button>`;
+  if (b.status === 'settlement_due') body += `<div class="card stack"><h2>تسوية الشيفت</h2>
+      <div class="between"><span>دخل الشيفت</span><strong>${money(b.revenue_total)}</strong></div>
+      <div class="between"><span>نصيب العيادة</span><strong>${money(b.clinic_share)}</strong></div>
+      <div class="between"><span>اللي دفعته مقدمًا</span><strong>${money(b.amount_due)}</strong></div></div>` + payBox(b.settle_due, 's', b.admin_note);
+  if (b.status === 'settlement_review') body += `<div class="card notice ok">استلمنا تحويل التسوية وبنراجعه.</div>`;
+  if (b.status === 'cancelled' && b.refund_due > 0) body += `<div class="card ${b.refund_done ? 'notice ok' : 'notice'}">${b.refund_done ? 'رجّعنالك' : 'هيرجعلك'} ${money(b.refund_due)} على إنستاباي المسجل في ملفك.</div>`;
+  if (['completed','settlement_due','settlement_review'].includes(b.status) && !reviewed) body += reviewBox();
+  app.querySelector('main').innerHTML = body;
+
+  const pay = (pfx, rpc) => $(pfx + '-send')?.addEventListener('click', e => run(e.target, async () => {
+    const ref = $(pfx + '-ref').value.trim(); if (!ref) throw new Error('اكتب رقم العملية');
+    const proof = await upload('docs', 'proofs', $(pfx + '-file').files[0]);
+    must(await sb.rpc(rpc, { p_booking:id, p_ref:ref, p_proof:proof })); toast('اتبعت للمراجعة'); viewBooking(id);
+  }));
+  pay('p', 'submit_payment'); pay('s', 'submit_settlement');
+  $('iv-add')?.addEventListener('click', e => run(e.target, async () => {
+    const procedure = $('iv-p').value.trim(), amount = parseInt($('iv-a').value, 10);
+    if (procedure.length < 2 || !(amount > 0)) throw new Error('اكتب العلاج والمبلغ');
+    must(await sb.from('invoices').insert({ booking_id:id, procedure, amount })); viewBooking(id);
+  }));
+  app.querySelectorAll('[data-del]').forEach(btn => btn.onclick = () => run(btn, async () => { must(await sb.from('invoices').delete().eq('id', btn.dataset.del)); viewBooking(id); }));
+  $('finish')?.addEventListener('click', e => run(e.target, async () => {
+    if (s.mode === 'percent' && !confirm(`إجمالي الفواتير ${money(total)}. متأكد إن الشيفت خلص؟ بعد كده الفواتير بتتقفل.`)) return;
+    must(await sb.rpc('finish_shift', { p_booking:id })); toast('تم'); viewBooking(id);
+  }));
+  $('cancel')?.addEventListener('click', e => run(e.target, async () => {
+    const hrs = (new Date(`${s.shift_date}T${s.start_time}+02:00`) - new Date()) / 36e5;
+    const free = Number(S.settings.cancel_free_hours ?? 24);
+    const msg = b.status === 'pending_payment' ? 'تلغي الحجز؟ مفيش أي رسوم.'
+      : hrs >= free ? `تلغي الحجز؟ هيرجعلك ${money(b.amount_due)} خلال 3 أيام عمل.`
+      : `الشيفت فاضل عليه أقل من ${free} ساعة، فالمبلغ (${money(b.amount_due)}) مش هيرجع وهيتحوّل للعيادة تعويض. تلغي برضه؟`;
+    if (!confirm(msg)) return;
+    must(await sb.rpc('cancel_booking', { p_booking:id })); toast('اتلغى'); viewBooking(id);
+  }));
+  bindReview(id, () => viewBooking(id));
+}
+
+function reviewBox(){
+  return `<div class="card stack"><h2>قيّم الطرف التاني</h2>
+    <div><label for="rv">التقييم</label><select id="rv">${[5,4,3,2,1].map(n => `<option value="${n}">${n} من 5</option>`).join('')}</select></div>
+    <div><label for="rc">تعليق (اختياري)</label><input id="rc" maxlength="300"></div>
+    <button class="btn sec" id="rsend">إرسال التقييم</button></div>`;
+}
+function bindReview(id, after){
+  $('rsend')?.addEventListener('click', e => run(e.target, async () => {
+    must(await sb.rpc('add_review', { p_booking:id, p_rating:parseInt($('rv').value,10), p_comment:$('rc').value.trim() || null }));
+    toast('شكرًا'); after();
+  }));
+}
+
+async function viewProfile(){
+  shell('<div class="spin">جاري التحميل…</div>', '#/profile');
+  await loadMe();
+  const d = S.doctor, p = S.me, c = S.contact;
+  const revs = (await sb.from('reviews').select('rating').eq('target_id', p.id)).data || [];
+  const done = (await sb.from('bookings').select('id', { count:'exact', head:true }).eq('status','completed')).count || 0;
+  app.querySelector('main').innerHTML = `
+    <section class="card stack" style="align-items:center;text-align:center">
+      <h1>د. ${esc(p.full_name)}</h1>${chip(d.status)}
+      ${d.status === 'rejected' && d.reject_reason ? `<div class="notice">سبب الرفض: ${esc(d.reject_reason)}</div>` : ''}
+      <div class="grid2" style="width:100%"><div class="card"><div class="big">${done.toLocaleString('ar-EG')}</div><div class="muted">شيفت مكتمل</div></div>
+        <div class="card"><div class="big">${revs.length ? (revs.reduce((a,r) => a + r.rating, 0) / revs.length).toFixed(1) : '—'}</div><div class="muted">تقييم العيادات</div></div></div>
+    </section>
+    <section class="card stack"><h2>بياناتي</h2>
+      <div><label for="p-name">الاسم</label><input id="p-name" value="${esc(p.full_name)}" maxlength="80"></div>
+      <div class="grid2"><div><label for="p-phone">الموبايل</label><input id="p-phone" dir="ltr" value="${esc(c.phone || '')}"></div>
+        <div><label for="p-area">المنطقة</label><input id="p-area" value="${esc(p.area || '')}"></div></div>
+      <div><label for="p-ip">إنستاباي أو محفظة (للاسترداد)</label><input id="p-ip" dir="ltr" value="${esc(c.instapay || '')}"></div>
+      <div class="grid2"><div><label for="p-syn">رقم كارنيه النقابة</label><input id="p-syn" value="${esc(d.syndicate_no || '')}"></div>
+        <div><label for="p-gy">سنة التخرج</label><input id="p-gy" type="number" value="${esc(d.grad_year || '')}"></div></div>
+      <div><label for="p-sp">التخصصات (افصل بفاصلة)</label><input id="p-sp" value="${esc(d.specialties.join('، '))}" placeholder="علاج جذور، حشو تجميلي"></div>
+      <div><label for="p-bio">نبذة قصيرة</label><textarea id="p-bio" maxlength="600">${esc(d.bio || '')}</textarea></div>
+    </section>
+    ${waVerifyBox('doctor', d.status, [`الاسم: د. ${p.full_name}`, `رقم القيد: ${d.syndicate_no || '—'}`])}
+    <section class="card stack"><h2>حالاتي (قبل وبعد)</h2>
+      <p class="muted" style="margin:0">بتظهر للعيادات. ما ترفعش صور فيها وش المريض أو اسمه، وخد موافقته.</p>
+      ${d.case_paths.length ? `<div class="thumbs">${d.case_paths.map(x => `<img src="${esc(mediaUrl(x))}" alt="حالة" loading="lazy">`).join('')}</div>` : ''}
+      <input id="p-cases" type="file" accept="image/*" multiple aria-label="رفع صور حالات">
+    </section>
+    <button class="btn block" id="p-save">حفظ</button>`;
+  $('p-save').onclick = e => run(e.target, async () => {
+    const phone = $('p-phone').value.replace(/[^0-9+]/g,'');
+    if (phone && !/^\+?[0-9]{8,15}$/.test(phone)) throw new Error('رقم الموبايل غير صحيح');
+    must(await sb.from('profiles').update({ full_name:$('p-name').value.trim(), area:$('p-area').value.trim() || null }).eq('id', p.id));
+    must(await sb.from('contacts').upsert({ user_id:p.id, phone:phone || null, instapay:$('p-ip').value.trim() || null }));
+    const upd = { syndicate_no:$('p-syn').value.trim() || null, grad_year:parseInt($('p-gy').value,10) || null,
+      specialties:csv($('p-sp').value), bio:$('p-bio').value.trim() || null };
+    const files = [...$('p-cases').files].slice(0, 6);
+    if (files.length) { const ps = []; for (const f of files) ps.push(await upload('media', 'cases', f)); upd.case_paths = [...ps, ...d.case_paths].slice(0, 9); }
+    must(await sb.from('doctors').update(upd).eq('id', p.id));
+    toast('اتحفظ'); viewProfile();
+  });
+}
+
+/* ---------- العيادة ---------- */
+async function viewClinicEdit(){
+  shell('<div class="spin">جاري التحميل…</div>', '#/clinic/edit');
+  await loadMe();
+  const c = S.clinic, priv = c ? (await sb.from('clinic_private').select('*').eq('clinic_id', c.id).maybeSingle()).data || {} : {};
+  app.querySelector('main').innerHTML = `
+    <h1>${c ? 'بيانات العيادة' : 'سجّل عيادتك'}</h1>
+    ${c ? `<div>${chip(c.status)} ${c.status === 'rejected' && c.reject_reason ? `<span class="muted">${esc(c.reject_reason)}</span>` : ''}</div>` : '<p class="muted">بعد المراجعة والتوثيق تقدر تعرض شيفتات.</p>'}
+    <section class="card stack">
+      <div><label for="c-name">اسم العيادة (زي الترخيص)</label><input id="c-name" value="${esc(c?.name || '')}" maxlength="80"></div>
+      <div><label for="c-area">المنطقة</label><input id="c-area" value="${esc(c?.area || S.me.area || '')}" maxlength="80" placeholder="مدينة نصر — الحي السابع"></div>
+      <div><label for="c-eq">التجهيزات (افصل بفاصلة)</label><input id="c-eq" value="${esc((c?.equipment || []).join('، '))}" placeholder="أشعة، روتاري، أبكس، أوتوكلاف، مساعدة"></div>
+      <div><label for="c-addr">العنوان بالتفصيل (يظهر للطبيب بعد الحجز فقط)</label><input id="c-addr" value="${esc(priv.address || '')}" maxlength="300"></div>
+      <div><label for="c-map">لينك جوجل ماب</label><input id="c-map" dir="ltr" value="${esc(priv.map_link || '')}"></div>
+      <div><label for="c-ip">إنستاباي أو محفظة العيادة (لتحويل نصيبك)</label><input id="c-ip" dir="ltr" value="${esc(S.contact.instapay || '')}"></div>
+    </section>
+    ${c ? waVerifyBox('clinic', c.status, [`العيادة: ${c.name} — ${c.area}`, `صاحبها: د. ${S.me.full_name}`]) : '<div class="notice">احفظ بيانات العيادة الأول، وبعدها هيظهرلك زرار تبعت منه تسجيل النقابة أو الترخيص على واتساب.</div>'}
+    <section class="card stack"><h2>صور العيادة</h2>
+      ${c?.photo_paths?.length ? `<div class="thumbs">${c.photo_paths.map(x => `<img src="${esc(mediaUrl(x))}" alt="صورة العيادة" loading="lazy">`).join('')}</div>` : ''}
+      <div><label for="c-ph">صور العيادة والكرسي</label><input id="c-ph" type="file" accept="image/*" multiple></div>
+    </section>
+    <button class="btn block" id="c-save">حفظ</button>`;
+  $('c-save').onclick = e => run(e.target, async () => {
+    const row = { name:$('c-name').value.trim(), area:$('c-area').value.trim(), equipment:csv($('c-eq').value) };
+    if (row.name.length < 2 || row.area.length < 2) throw new Error('اكتب اسم العيادة والمنطقة');
+    const files = [...$('c-ph').files].slice(0, 6);
+    if (files.length) { const ps = []; for (const f of files) ps.push(await upload('media', 'clinic', f)); row.photo_paths = [...ps, ...(c?.photo_paths || [])].slice(0, 6); }
+    let cid = c?.id;
+    if (c) must(await sb.from('clinics').update(row).eq('id', c.id));
+    else cid = must(await sb.from('clinics').insert({ ...row, owner_id:S.me.id }).select('id').single()).id;
+    must(await sb.from('clinic_private').upsert({ clinic_id:cid, address:$('c-addr').value.trim() || null, map_link:$('c-map').value.trim() || null }));
+    must(await sb.from('contacts').upsert({ user_id:S.me.id, phone:S.contact.phone || null, instapay:$('c-ip').value.trim() || null }));
+    toast(c ? 'اتحفظ' : 'اتحفظ — ابعت تسجيل النقابة أو الترخيص على واتساب علشان نوثّق العيادة'); c ? location.hash = '#/clinic' : viewClinicEdit();
+  });
+}
+
+async function viewClinic(){
+  shell('<div class="spin">جاري التحميل…</div>', '#/clinic');
+  await loadMe();
+  const c = S.clinic;
+  if (!c) { location.hash = '#/clinic/edit'; return; }
+  const bal = ((await sb.rpc('clinic_balance', {})).data || [])[0] || { earned:0, paid:0, balance:0 };
+  const shifts = must(await sb.from('shifts').select('*, bookings(id, status, doctor_id, doctors(profiles(full_name)))')
+    .eq('clinic_id', c.id).gte('shift_date', new Date(Date.now() - 14*864e5).toISOString().slice(0,10))
+    .order('shift_date').order('start_time').limit(80));
+  const active = b => b && !['cancelled','expired'].includes(b.status);
+  app.querySelector('main').innerHTML = `
+    <div class="between"><div><p class="muted" style="margin:0">لوحة العيادة</p><h1>${esc(c.name)}</h1></div>${chip(c.status)}</div>
+    ${c.status !== 'verified' ? `<div class="notice">${c.status === 'rejected' ? 'العيادة اترفضت: ' + esc(c.reject_reason || '') : 'العيادة لسه ما اتوثّقتش. ابعت تسجيل النقابة أو الترخيص على واتساب من صفحة البيانات.'} <a href="#/clinic/edit">البيانات</a></div>` : ''}
+    <section class="card" style="background:var(--ink);color:#fff;border:none">
+      <div style="color:#CBD5E1;font-size:13px">رصيدك عند المنصة</div><div class="big">${money(bal.balance)}</div>
+      <div style="color:#CBD5E1;font-size:13px">إجمالي نصيبك ${money(bal.earned)} · اتحوّل لك ${money(bal.paid)}</div></section>
+    <a class="btn block" href="#/clinic/new">${icon.plus} اعرض شيفت فاضي</a>
+    <h2>الشيفتات</h2>
+    ${shifts.length ? shifts.map(s => { const b = (s.bookings || []).find(active); return `
+      <div class="card stack"><div class="between"><strong>${dateAr(s.shift_date)}</strong>${b ? chip(b.status) : chip(s.status)}</div>
+        <div class="muted">${timeAr(s.start_time)} – ${timeAr(s.end_time)} · ${priceText(s)}</div>
+        ${b ? `<div class="between"><span>د. ${esc(b.doctors?.profiles?.full_name || '')}</span><a class="btn sec" href="#/clinic/booking/${b.id}">التفاصيل</a></div>`
+            : s.status === 'open' ? `<button class="btn bad" data-cancel="${s.id}">إلغاء الشيفت</button>` : ''}
+      </div>`; }).join('') : '<div class="card muted">لسه ما عرضتش شيفتات.</div>'}`;
+  app.querySelectorAll('[data-cancel]').forEach(btn => btn.onclick = () => run(btn, async () => {
+    if (!confirm('تلغي الشيفت ده؟')) return;
+    must(await sb.from('shifts').update({ status:'cancelled' }).eq('id', btn.dataset.cancel)); viewClinic();
+  }));
+}
+
+function viewNewShift(){
+  if (!S.clinic) { location.hash = '#/clinic/edit'; return; }
+  const today = new Date(Date.now() + 2*36e5).toISOString().slice(0,10);
+  shell(`<h1>شيفت جديد</h1>
+    ${S.clinic.status !== 'verified' ? '<div class="notice">تقدر تعرض شيفتات بعد توثيق العيادة.</div>' : ''}
+    <section class="card stack">
+      <div><label for="n-d">اليوم</label><input id="n-d" type="date" min="${today}" value="${today}"></div>
+      <div class="grid2"><div><label for="n-s">من</label><input id="n-s" type="time" value="10:00"></div>
+        <div><label for="n-e">إلى</label><input id="n-e" type="time" value="15:00"></div></div>
+      <div><label for="n-rep">كرره كل أسبوع لمدة</label><select id="n-rep"><option value="1">مرة واحدة</option><option value="4">4 أسابيع</option><option value="8">8 أسابيع</option></select></div>
+    </section>
+    <section class="card stack"><h2>طريقة الدفع</h2>
+      <div class="seg" role="group" aria-label="طريقة الدفع"><button type="button" id="m-f" aria-pressed="true">سعر ثابت</button><button type="button" id="m-p" aria-pressed="false">نسبة من الدخل</button></div>
+      <div id="m-fixed"><label for="n-price">سعر الشيفت (جنيه)</label><input id="n-price" type="number" value="500" min="50"></div>
+      <div id="m-pct" class="grid2" hidden><div><label for="n-pct">نسبة العيادة %</label><input id="n-pct" type="number" value="35" min="5" max="80"></div>
+        <div><label for="n-min">الحد الأدنى (جنيه)</label><input id="n-min" type="number" value="300" min="0"></div></div>
+      <p class="muted" style="margin:0" id="m-note"></p>
+    </section>
+    <section class="card stack"><h2>الشيفت يشمل</h2>
+      <div><label for="n-inc">افصل بفاصلة</label><input id="n-inc" value="${esc((S.clinic.equipment || []).join('، '))}"></div>
+      <div><label for="n-notes">ملاحظات</label><textarea id="n-notes" maxlength="400" placeholder="الخامات على الطبيب، أو متاحة بسعر الجملة"></textarea></div>
+    </section>
+    <button class="btn block" id="n-save" ${S.clinic.status !== 'verified' ? 'disabled' : ''}>اعرض الشيفت</button>`, '#/clinic/new');
+  let mode = 'fixed';
+  const fp = Number(S.settings.commission_fixed_pct), pp = Number(S.settings.commission_percent_pct), pm = Number(S.settings.commission_min);
+  const note = () => $('m-note').textContent = mode === 'fixed'
+    ? `عمولة المنصة ${fp}% من السعر، والباقي يتحوّل لك.`
+    : `عمولة المنصة ${pp}% من دخل الشيفت (أقلها ${pm} جنيه) وبتتخصم من نصيبك. الطبيب بيدفع الحد الأدنى مقدمًا.`;
+  const set = m => { mode = m; $('m-f').setAttribute('aria-pressed', m === 'fixed'); $('m-p').setAttribute('aria-pressed', m === 'percent');
+    $('m-fixed').hidden = m !== 'fixed'; $('m-pct').hidden = m !== 'percent'; note(); };
+  $('m-f').onclick = () => set('fixed'); $('m-p').onclick = () => set('percent'); note();
+  $('n-save').onclick = e => run(e.target, async () => {
+    const base = { clinic_id:S.clinic.id, start_time:$('n-s').value, end_time:$('n-e').value, mode,
+      includes:csv($('n-inc').value), notes:$('n-notes').value.trim() || null };
+    if (!(base.end_time > base.start_time)) throw new Error('معاد النهاية لازم يكون بعد البداية');
+    if (mode === 'fixed') base.price = parseInt($('n-price').value,10);
+    else { base.percent = parseInt($('n-pct').value,10); base.min_guarantee = parseInt($('n-min').value,10) || 0; }
+    const n = parseInt($('n-rep').value,10), d0 = new Date($('n-d').value + 'T12:00:00');
+    const rows = Array.from({ length:n }, (_, i) => ({ ...base, shift_date:new Date(d0.getTime() + i*7*864e5).toISOString().slice(0,10) }));
+    must(await sb.from('shifts').insert(rows));
+    toast(n > 1 ? `اتعرض ${n} شيفتات` : 'اتعرض الشيفت'); location.hash = '#/clinic';
+  });
+}
+
+async function viewClinicBooking(id){
+  shell('<div class="spin">جاري التحميل…</div>', '#/clinic');
+  const b = (await sb.from('bookings').select('*, shifts(*)').eq('id', id).maybeSingle()).data;
+  if (!b) { app.querySelector('main').innerHTML = '<div class="card">الحجز غير موجود.</div>'; return; }
+  const s = b.shifts;
+  const [prof, doc, revs, inv, rv] = await Promise.all([
+    sb.from('profiles').select('full_name, area').eq('id', b.doctor_id).single(),
+    sb.from('doctors').select('specialties, bio, case_paths, grad_year, status').eq('id', b.doctor_id).single(),
+    sb.from('reviews').select('rating').eq('target_id', b.doctor_id),
+    sb.from('invoices').select('*').eq('booking_id', id).order('created_at'),
+    sb.from('reviews').select('id').eq('booking_id', id).eq('author_id', S.session.user.id)]);
+  const d = doc.data || {}, rs = revs.data || [], ivs = inv.data || [];
+  const contact = ['confirmed','settlement_due','settlement_review'].includes(b.status) ? ((await sb.rpc('booking_contact', { p_booking:id })).data || [])[0] : null;
+  const started = new Date(`${s.shift_date}T${s.start_time}+02:00`) <= new Date();
+  const hire = (await sb.from('hires').select('*').eq('doctor_id', b.doctor_id).order('created_at', { ascending:false }).limit(1)).data?.[0];
+  app.querySelector('main').innerHTML = `
+    <a href="#/clinic">→ عيادتي</a>
+    <section class="card stack"><div class="between"><strong>د. ${esc(prof.data?.full_name)}</strong>${chip(b.status)}</div>
+      <div class="muted">${dateAr(s.shift_date)} · ${timeAr(s.start_time)} – ${timeAr(s.end_time)} · ${priceText(s)}</div>
+      <div class="row">${(d.specialties || []).map(t => `<span class="chip">${esc(t)}</span>`).join('')}${d.grad_year ? `<span class="chip">دفعة ${esc(d.grad_year)}</span>` : ''}</div>
+      <div class="muted">${rs.length ? `تقييم العيادات: ${(rs.reduce((a,r) => a + r.rating, 0) / rs.length).toFixed(1)} من 5 (${rs.length})` : 'لسه مفيش تقييمات'}</div>
+      ${d.bio ? `<p style="margin:0">${esc(d.bio)}</p>` : ''}
+      ${d.case_paths?.length ? `<div class="thumbs">${d.case_paths.slice(0,6).map(x => `<img src="${esc(mediaUrl(x))}" alt="حالة" loading="lazy">`).join('')}</div>` : ''}
+    </section>
+    ${contact ? `<section class="card stack"><h2>التواصل</h2><a class="btn sec" href="tel:${esc(contact.doctor_phone)}">اتصال بالطبيب</a></section>`
+      : ['confirmed'].includes(b.status) ? '<div class="card muted">رقم الطبيب بيظهر من يوم قبل الشيفت.</div>' : ''}
+    ${s.mode === 'percent' && ivs.length ? `<section class="card"><h2>فواتير الشيفت</h2><table><tbody>${ivs.map(x => `<tr><td>${esc(x.procedure)}</td><td>${money(x.amount)}</td></tr>`).join('')}</tbody></table>
+      <p class="muted">لو في فاتورة ناقصة كلّم الدعم قبل ما الشيفت يتقفل.</p></section>` : ''}
+    ${b.clinic_share != null ? `<section class="card stack"><h2>الحساب</h2>
+      <div class="between"><span>نصيب العيادة</span><strong>${money(b.clinic_share)}</strong></div>
+      <div class="between"><span>عمولة المنصة</span><strong>${money(b.platform_fee)}</strong></div>
+      <div class="between"><span>صافي ليك</span><strong>${money(b.clinic_share - b.platform_fee)}</strong></div></section>` : ''}
+    ${b.status === 'confirmed' ? `<button class="btn block" id="finish" ${started ? '' : 'disabled'}>الشيفت خلص</button><button class="btn bad block" id="cancel">إلغاء (الطبيب يسترد كامل المبلغ)</button>` : ''}
+    ${['completed','settlement_due','settlement_review'].includes(b.status) && !rv.data?.length ? reviewBox() : ''}
+    <section class="card stack"><h2>التعامل المباشر طويل الأمد</h2>
+      ${hire && hire.status !== 'rejected' ? `<div>${chip(hire.status)} <a href="#/hire/${hire.id}">التفاصيل</a></div>`
+        : `<p class="muted" style="margin:0">عايز تتعامل مع الطبيب ده مباشرة بره المنصة على المدى الطويل؟ بتدفع عمولة تعريف مرة واحدة، ويتخصم منها العمولات اللي دفعتها قبل كده على شيفتاته.</p>
+           <button class="btn sec" id="hire">احسب عمولة التعريف</button>`}
+    </section>`;
+  $('finish')?.addEventListener('click', e => run(e.target, async () => { must(await sb.rpc('finish_shift', { p_booking:id })); viewClinicBooking(id); }));
+  $('cancel')?.addEventListener('click', e => run(e.target, async () => { if (!confirm('الإلغاء من العيادة بيرجّع للطبيب كامل المبلغ وبيقلل تقييمك. متأكد؟')) return; must(await sb.rpc('cancel_booking', { p_booking:id })); viewClinicBooking(id); }));
+  $('hire')?.addEventListener('click', e => run(e.target, async () => {
+    const q = must(await sb.rpc('hire_quote', { p_doctor:b.doctor_id }))[0];
+    if (!confirm(`عمولة التعريف ${money(q.fee)} − العمولات السابقة ${money(q.discount)} = ${money(q.amount_due)}. تكمّل؟`)) return;
+    const hid = must(await sb.rpc('request_hire', { p_doctor:b.doctor_id })); location.hash = '#/hire/' + hid;
+  }));
+  bindReview(id, () => viewClinicBooking(id));
+}
+
+async function viewHire(id){
+  shell('<div class="spin">جاري التحميل…</div>', '#/clinic');
+  const h = (await sb.from('hires').select('*').eq('id', id).maybeSingle()).data;
+  if (!h) { app.querySelector('main').innerHTML = '<div class="card">غير موجود.</div>'; return; }
+  const doc = (await sb.from('profiles').select('full_name').eq('id', h.doctor_id).single()).data;
+  app.querySelector('main').innerHTML = `<a href="#/clinic">→ عيادتي</a>
+    <section class="card stack"><div class="between"><h1 style="font-size:18px">تعامل مباشر مع د. ${esc(doc?.full_name)}</h1>${chip(h.status)}</div>
+      <div class="between"><span>عمولة التعريف</span><span>${money(h.fee)}</span></div>
+      <div class="between"><span>خصم العمولات السابقة</span><span>− ${money(h.discount)}</span></div>
+      <div class="between"><strong>المطلوب</strong><span class="price">${money(h.amount_due)}</span></div>
+      <p class="muted" style="margin:0">مرة واحدة، والطبيب مش بيدفع حاجة. بعد التأكيد تتفقوا مع بعض مباشرة.</p></section>
+    ${h.status === 'pending_payment' ? payBox(h.amount_due, 'h') : h.status === 'payment_review' ? '<div class="card notice ok">بنراجع التحويل.</div>' : h.status === 'approved' ? '<div class="card notice ok">اتأكد. تقدروا تتعاملوا مع بعض مباشرة. بالتوفيق.</div>' : ''}`;
+  $('h-send')?.addEventListener('click', e => run(e.target, async () => {
+    const ref = $('h-ref').value.trim(); if (!ref) throw new Error('اكتب رقم العملية');
+    const proof = await upload('docs', 'proofs', $('h-file').files[0]);
+    must(await sb.rpc('submit_hire_payment', { p_hire:id, p_ref:ref, p_proof:proof })); viewHire(id);
+  }));
+}
+
+/* ---------- الأدمن ---------- */
+async function viewAdmin(tab = 'verify'){
+  const tabs = [['verify','التوثيق'],['pay','التحويلات'],['refund','الاسترداد'],['payout','تحويل العيادات'],['rentals','الإيجار'],['watch','مراقبة'],['settings','الإعدادات']];
+  shell(`<h1>الإدارة</h1><div class="tabs" role="tablist">${tabs.map(([k,t]) => `<button role="tab" data-tab="${k}" aria-selected="${k === tab}">${t}</button>`).join('')}</div><div id="adm"><div class="spin">جاري التحميل…</div></div>`, '#/admin');
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => viewAdmin(b.dataset.tab));
+  const box = $('adm');
+  const names = async ids => { const u = [...new Set(ids.filter(Boolean))]; if (!u.length) return {}; const r = must(await sb.from('profiles').select('id, full_name').in('id', u)); return Object.fromEntries(r.map(x => [x.id, x.full_name])); };
+  const contacts = async ids => { const u = [...new Set(ids.filter(Boolean))]; if (!u.length) return {}; const r = must(await sb.from('contacts').select('*').in('user_id', u)); return Object.fromEntries(r.map(x => [x.user_id, x])); };
+  const docBtn = (p, t) => p ? `<button class="btn sec" data-doc="${esc(p)}" style="min-height:38px">${t}</button>` : `<span class="muted">${t}: مش مرفوع</span>`;
+
+  if (tab === 'verify') {
+    const docs = must(await sb.from('doctors').select('*').eq('status','pending'));
+    const cls = must(await sb.from('clinics').select('*').eq('status','pending'));
+    const n = await names([...docs.map(d => d.id), ...cls.map(c => c.owner_id)]), ct = await contacts([...docs.map(d => d.id), ...cls.map(c => c.owner_id)]);
+    const wa = (uid, txt) => { const num = waNum(ct[uid]?.phone); return num ? `<a class="btn wa" style="min-height:38px" href="${esc(waHref(num, txt))}" target="_blank" rel="noopener">${icon.wa} واتساب</a>` : '<span class="muted">مفيش رقم</span>'; };
+    box.innerHTML = `<p class="muted">الورق بيوصلك على واتساب. الطبيب: كارنيه النقابة أو ترخيص مزاولة المهنة. العيادة: تسجيلها في النقابة أو ترخيصها. راجع الورقة، وبعدين وثّق أو ارفض. امسح صور الورق من المحادثة بعد 30 يوم من التوثيق.</p><h2>أطباء (${docs.length})</h2>` + (docs.map(d => `<div class="card stack">
+        <strong>د. ${esc(n[d.id])}</strong><div class="muted">كارنيه: ${esc(d.syndicate_no || '—')} · دفعة ${esc(d.grad_year || '—')}</div>
+        <div class="muted" dir="ltr" style="text-align:right">${esc(ct[d.id]?.phone || '')}</div>
+        <div class="row">${wa(d.id, `أهلًا د. ${n[d.id] || ''}، معاك فريق DentaCore Shift بخصوص توثيق حسابك.`)}${d.card_path ? docBtn(d.card_path,'الكارنيه') : ''}${d.cert_path ? docBtn(d.cert_path,'الشهادة') : ''}</div>
+        <div class="row"><button class="btn" data-v="doctor|${d.id}|1">توثيق</button><button class="btn bad" data-v="doctor|${d.id}|0">رفض</button></div></div>`).join('') || '<div class="card muted">مفيش</div>')
+      + `<h2>عيادات (${cls.length})</h2>` + (cls.map(c => `<div class="card stack">
+        <strong>${esc(c.name)} — ${esc(c.area)}</strong><div class="muted">صاحبها: د. ${esc(n[c.owner_id])}</div>
+        <div class="muted" dir="ltr" style="text-align:right">${esc(ct[c.owner_id]?.phone || '')}</div>
+        <div class="row">${wa(c.owner_id, `أهلًا د. ${n[c.owner_id] || ''}، معاك فريق DentaCore Shift بخصوص توثيق «${c.name}».`)}${c.license_path ? docBtn(c.license_path,'الترخيص') : ''}</div>
+        <div class="row"><button class="btn" data-v="clinic|${c.id}|1">توثيق</button><button class="btn bad" data-v="clinic|${c.id}|0">رفض</button></div></div>`).join('') || '<div class="card muted">مفيش</div>');
+    box.querySelectorAll('[data-v]').forEach(b => b.onclick = () => run(b, async () => {
+      const [k, id, ok] = b.dataset.v.split('|'); let reason = null;
+      if (ok === '0') { reason = prompt('سبب الرفض (هيظهر للمستخدم):'); if (reason === null) return; }
+      must(await sb.rpc('admin_verify', { p_kind:k, p_id:id, p_ok:ok === '1', p_reason:reason })); viewAdmin('verify');
+    }));
+  }
+
+  if (tab === 'pay') {
+    const bk = must(await sb.from('bookings').select('*, shifts(shift_date, start_time, clinics(name))').in('status',['payment_review','settlement_review']).order('created_at'));
+    const hs = must(await sb.from('hires').select('*').eq('status','payment_review'));
+    const n = await names([...bk.map(b => b.doctor_id), ...hs.map(h => h.doctor_id)]);
+    box.innerHTML = `<p class="muted">طابق رقم العملية والمبلغ مع كشف حسابك في البنك قبل التأكيد — ما تعتمدش على الصورة لوحدها.</p>` +
+      (bk.map(b => { const settle = b.status === 'settlement_review'; return `<div class="card stack">
+        <div class="between"><strong>${settle ? 'تسوية' : 'حجز'} · ${money(settle ? b.settle_due : b.amount_due)}</strong>${chip(b.status)}</div>
+        <div class="muted">د. ${esc(n[b.doctor_id])} ← ${esc(b.shifts.clinics.name)} · ${dateAr(b.shifts.shift_date)}</div>
+        <div>رقم العملية: <strong dir="ltr">${esc(settle ? b.settle_ref : b.pay_ref)}</strong></div>
+        <div class="row">${docBtn(settle ? b.settle_proof_path : b.proof_path,'صورة التحويل')}</div>
+        <div class="row"><button class="btn" data-p="${settle ? 's' : 'b'}|${b.id}|1">تأكيد</button><button class="btn bad" data-p="${settle ? 's' : 'b'}|${b.id}|0">رفض</button></div></div>`; }).join('') || '') +
+      (hs.map(h => `<div class="card stack"><strong>تعامل مباشر · ${money(h.amount_due)}</strong><div class="muted">د. ${esc(n[h.doctor_id])}</div>
+        <div>رقم العملية: <strong dir="ltr">${esc(h.pay_ref)}</strong></div><div class="row">${docBtn(h.proof_path,'صورة التحويل')}</div>
+        <div class="row"><button class="btn" data-p="h|${h.id}|1">تأكيد</button><button class="btn bad" data-p="h|${h.id}|0">رفض</button></div></div>`).join('')) ||
+      '<div class="card muted">مفيش تحويلات مستنية.</div>';
+    box.querySelectorAll('[data-p]').forEach(b => b.onclick = () => run(b, async () => {
+      const [k, id, ok] = b.dataset.p.split('|'); const yes = ok === '1'; let note = null;
+      if (!yes) { note = prompt('سبب الرفض (هيظهر للمستخدم):', 'التحويل مش ظاهر عندنا'); if (note === null) return; }
+      if (k === 'b') must(await sb.rpc('admin_review_payment', { p_booking:id, p_ok:yes, p_note:note }));
+      if (k === 's') must(await sb.rpc('admin_review_settlement', { p_booking:id, p_ok:yes, p_note:note }));
+      if (k === 'h') must(await sb.rpc('admin_review_hire', { p_hire:id, p_ok:yes }));
+      viewAdmin('pay');
+    }));
+  }
+
+  if (tab === 'refund') {
+    const bk = must(await sb.from('bookings').select('*').eq('status','cancelled').gt('refund_due',0).eq('refund_done',false));
+    const n = await names(bk.map(b => b.doctor_id)), c = await contacts(bk.map(b => b.doctor_id));
+    box.innerHTML = bk.map(b => `<div class="card stack"><strong>${money(b.refund_due)} لـ د. ${esc(n[b.doctor_id])}</strong>
+      <div>إنستاباي/محفظة: <strong dir="ltr">${esc(c[b.doctor_id]?.instapay || 'مش مسجل — كلمه')}</strong> · <span dir="ltr">${esc(c[b.doctor_id]?.phone || '')}</span></div>
+      <button class="btn" data-r="${b.id}">حوّلت المبلغ</button></div>`).join('') || '<div class="card muted">مفيش مبالغ مستردة مستنية.</div>';
+    box.querySelectorAll('[data-r]').forEach(b => b.onclick = () => run(b, async () => { must(await sb.rpc('admin_mark_refund', { p_booking:b.dataset.r })); viewAdmin('refund'); }));
+  }
+
+  if (tab === 'payout') {
+    const cls = must(await sb.from('clinics').select('*').eq('status','verified'));
+    const c = await contacts(cls.map(x => x.owner_id));
+    const bals = await Promise.all(cls.map(x => sb.rpc('clinic_balance', { p_clinic:x.id }).then(r => (r.data || [])[0])));
+    const list = cls.map((x, i) => ({ ...x, bal:bals[i] })).filter(x => x.bal?.balance > 0);
+    box.innerHTML = `<p class="muted">حوّل لكل عيادة رصيدها في يوم ثابت كل أسبوع، وسجّل التحويل هنا.</p>` + (list.map(x => `<div class="card stack">
+      <div class="between"><strong>${esc(x.name)}</strong><span class="price">${money(x.bal.balance)}</span></div>
+      <div>إنستاباي/محفظة: <strong dir="ltr">${esc(c[x.owner_id]?.instapay || 'مش مسجل')}</strong></div>
+      <div class="grid2"><input id="pa-${x.id}" type="number" value="${x.bal.balance}" aria-label="المبلغ"><input id="pr-${x.id}" placeholder="رقم العملية" dir="ltr" aria-label="رقم العملية"></div>
+      <button class="btn" data-pay="${x.id}">سجّل التحويل</button></div>`).join('') || '<div class="card muted">مفيش أرصدة مستحقة.</div>');
+    box.querySelectorAll('[data-pay]').forEach(b => b.onclick = () => run(b, async () => {
+      const id = b.dataset.pay, amount = parseInt($('pa-' + id).value,10); if (!(amount > 0)) throw new Error('المبلغ غلط');
+      must(await sb.from('payouts').insert({ clinic_id:id, amount, ref:$('pr-' + id).value.trim() || null })); viewAdmin('payout');
+    }));
+  }
+
+  if (tab === 'rentals') await adminRentals(box, names, contacts, docBtn);
+
+  if (tab === 'watch') {
+    const todayIso = new Date(Date.now() + 2*36e5).toISOString().slice(0,10);
+    const stale = must(await sb.from('bookings').select('*, shifts(shift_date, start_time, clinics(name))').eq('status','confirmed').order('created_at'))
+      .filter(b => b.shifts.shift_date < todayIso);
+    const sn = await names(stale.map(b => b.doctor_id));
+    const pairs = must(await sb.from('admin_pairs').select('*'));
+    const cls = pairs.length ? must(await sb.from('clinics').select('id, name').in('id', pairs.map(p => p.clinic_id))) : [];
+    const cn = Object.fromEntries(cls.map(x => [x.id, x.name])), n = await names(pairs.map(p => p.doctor_id));
+    box.innerHTML = `<h2>شيفتات فاتت ولسه ما اتقفلتش (${stale.length})</h2><p class="muted">كلّم العيادة واتأكد: الطبيب حضر ولا لأ.</p>` +
+      (stale.map(b => `<div class="card stack"><strong>د. ${esc(sn[b.doctor_id])} ← ${esc(b.shifts.clinics.name)}</strong>
+        <div class="muted">${dateAr(b.shifts.shift_date)} · ${timeAr(b.shifts.start_time)}</div>
+        <div class="row"><button class="btn" data-fin="${b.id}">حضر — اقفل الشيفت</button><button class="btn bad" data-ns="${b.id}">ما حضرش</button></div></div>`).join('') || '<div class="card muted">مفيش.</div>') +
+      `<h2 style="margin-top:12px">احتمال اتفاق من برا</h2><p class="muted">طبيب وعيادة اشتغلوا مع بعض 3 مرات أو أكتر ووقفوا من أكتر من شهر — غالبًا اتفقوا برا. كلّمهم واعرض «التعامل المباشر طويل الأمد».</p>` +
+      (pairs.map(p => `<div class="card"><strong>د. ${esc(n[p.doctor_id])} ↔ ${esc(cn[p.clinic_id])}</strong><div class="muted">${p.shifts_together} شيفت · آخر شيفت ${dateAr(p.last_shift)}</div></div>`).join('') || '<div class="card muted">مفيش حالات.</div>');
+  }
+
+  if (tab === 'settings') {
+    const st = must(await sb.from('settings').select('*').order('key'));
+    const lbl = { commission_fixed_pct:'عمولة السعر الثابت %', commission_percent_pct:'عمولة النسبة % من الدخل', commission_min:'أقل عمولة (جنيه)',
+      monthly_cap_pair:'سقف العمولة الشهري لنفس الطبيب والعيادة', hire_fee:'عمولة التعريف (التعامل المباشر)', hire_min:'أقل عمولة تعريف بعد الخصم',
+      hire_protect_months:'مدة عدم التجاوز في الشيفتات (شهور)', hold_hours:'مهلة التحويل (ساعات)', cancel_free_hours:'الإلغاء المجاني قبل (ساعات)',
+      instapay_address:'عنوان إنستاباي', wallet_number:'رقم المحفظة', support_whatsapp:'واتساب الدعم والتوثيق (01xxxxxxxxx)',
+      rental_min_months:'أقل مدة عقد إيجار (شهور)', rental_commission_months:'عمولة الإيجار (كام شهر إيجار)', rental_tenant_pct:'نصيب المستأجر من عمولة الإيجار %', rental_protect_months:'عدم التجاوز في الإيجار (شهور)' };
+    box.innerHTML = `<div class="card stack">${st.map(x => `<div><label for="st-${x.key}">${esc(lbl[x.key] || x.key)}</label>
+      <input id="st-${x.key}" value="${esc(typeof x.value === 'string' ? x.value : JSON.stringify(x.value))}" dir="ltr"></div>`).join('')}
+      <button class="btn" id="st-save">حفظ</button></div>`;
+    $('st-save').onclick = e => run(e.target, async () => {
+      for (const x of st) {
+        const raw = $('st-' + x.key).value.trim();
+        const val = typeof x.value === 'number' ? Number(raw) : raw;
+        if (typeof x.value === 'number' && !Number.isFinite(val)) throw new Error('رقم غلط في: ' + (lbl[x.key] || x.key));
+        if (JSON.stringify(val) !== JSON.stringify(x.value)) must(await sb.from('settings').update({ value:val }).eq('key', x.key));
+      }
+      toast('اتحفظ');
+    });
+  }
+  box.querySelectorAll('[data-doc]').forEach(b => b.onclick = () => run(b, () => openDoc(b.dataset.doc)));
+  box.querySelectorAll('[data-fin]').forEach(b => b.onclick = () => run(b, async () => { must(await sb.rpc('finish_shift', { p_booking:b.dataset.fin })); viewAdmin('watch'); }));
+  box.querySelectorAll('[data-ns]').forEach(b => b.onclick = () => run(b, async () => {
+    if (!confirm('الطبيب ما حضرش؟ المبلغ هيتحوّل للعيادة تعويض ومش هيرجع للطبيب.')) return;
+    must(await sb.rpc('admin_no_show', { p_booking:b.dataset.ns })); viewAdmin('watch'); }));
+}
+
+/* ---------- الإيجار السنوي ---------- */
+const rentFee = rent => Math.round(rent * DV('rental_commission_months') * DV('rental_tenant_pct') / 100);
+const ownerFee = rent => rent * DV('rental_commission_months') - rentFee(rent);
+const monthsTxt = n => n === 1 ? 'إيجار شهر واحد' : `إيجار ${n.toLocaleString('ar-EG')} شهور`;
+const furnishOpts = ['مجهزة بالكامل','مجهزة جزئيًا','فاضية (من غير أجهزة)'];
+const rentalFacts = r => [r.size_m2 && `${r.size_m2.toLocaleString('ar-EG')} م²`, r.rooms && `${r.rooms.toLocaleString('ar-EG')} غرف`,
+  r.chairs != null && `${r.chairs.toLocaleString('ar-EG')} كرسي`, r.furnished].filter(Boolean);
+const howRental = rent => `<section class="card stack"><h2>الإيجار بيتم إزاي</h2>
+  <ol style="margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px">
+    <li>بتطلب معاينة من هنا.</li>
+    <li>فريق DentaCore Shift بيكلمك، وبيرتب المعاينة مع المالك.</li>
+    <li>بنتابع معاكم التفاوض لحد إمضاء العقد. أقل مدة للعقد ${DV('rental_min_months').toLocaleString('ar-EG')} شهر.</li>
+    <li>عمولتنا ${monthsTxt(DV('rental_commission_months'))}: بتدفع ${DV('rental_tenant_pct').toLocaleString('ar-EG')}% منها يوم الإمضاء${rent ? ` (على الإيجار ده: ${money(rentFee(rent))})` : ''}، والمالك بيدفع الباقي.</li>
+  </ol>
+  <p class="muted" style="margin:0">كل التواصل مع المالك بيكون عن طريقنا لحد الإمضاء. <a href="#/rental-terms">شروط الإيجار السنوي</a></p></section>`;
+
+async function viewRentals(){
+  shell('<div class="spin">جاري التحميل…</div>', '#/rentals');
+  const area = sessionStorage.getItem('rarea') || '';
+  let rows = must(await sb.from('rentals').select('*').eq('status','active').order('created_at', { ascending:false }).limit(80));
+  if (area) rows = rows.filter(r => r.area.includes(area));
+  app.querySelector('main').innerHTML = `
+    <div><h1>عيادات للإيجار السنوي</h1>
+      <p class="muted" style="margin:0">عيادات كاملة للإيجار بعقد سنة على الأقل. التواصل مع المالك بيكون عن طريق فريق DentaCore Shift لحد إمضاء العقد.</p></div>
+    <div class="between"><a class="btn sec" href="#/my-rentals">طلباتي</a></div>
+    <div class="card row"><input id="ra" value="${esc(area)}" placeholder="المنطقة" style="flex:1" aria-label="المنطقة"><button class="btn sec" id="rgo">بحث</button></div>
+    ${rows.length ? rows.map(r => `
+      <article class="card stack">
+        ${r.photo_paths[0] ? `<img src="${esc(mediaUrl(r.photo_paths[0]))}" alt="" loading="lazy" style="width:100%;height:170px;object-fit:cover;border-radius:12px">` : ''}
+        <div><strong>${esc(r.title)}</strong><div class="muted">${esc(r.area)}</div></div>
+        <div class="row">${rentalFacts(r).map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
+        <div class="between"><div><div class="price">${money(r.monthly_rent)}</div><div class="muted">في الشهر · عقد ${r.min_months.toLocaleString('ar-EG')} شهر على الأقل</div></div>
+          <a class="btn" href="#/rental/${r.id}">التفاصيل</a></div>
+      </article>`).join('') : '<div class="card muted">مفيش عيادات معروضة بالبحث ده دلوقتي.</div>'}`;
+  $('rgo').onclick = () => { sessionStorage.setItem('rarea', $('ra').value.trim()); viewRentals(); };
+}
+
+async function viewRental(id){
+  shell('<div class="spin">جاري التحميل…</div>', '#/rentals');
+  await loadMe();
+  const r = must(await sb.from('rentals').select('*').eq('id', id).single());
+  const lead = (await sb.from('rental_leads').select('*').eq('rental_id', id).maybeSingle()).data;
+  const d = S.doctor, phone = S.contact.phone;
+  app.querySelector('main').innerHTML = `
+    <a href="#/rentals">→ رجوع</a>
+    <section class="card stack">
+      ${r.photo_paths.length ? `<div class="thumbs">${r.photo_paths.map(x => `<img src="${esc(mediaUrl(x))}" alt="صورة العيادة" loading="lazy">`).join('')}</div>` : ''}
+      <h1>${esc(r.title)}</h1><div class="muted">${esc(r.area)}</div>
+      <div class="row">${rentalFacts(r).map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
+      <div><span class="price">${money(r.monthly_rent)}</span> <span class="muted">في الشهر · عقد ${r.min_months.toLocaleString('ar-EG')} شهر على الأقل</span></div>
+      ${r.features.length ? `<div class="row">${r.features.map(t => `<span class="chip ok">${esc(t)}</span>`).join('')}</div>` : ''}
+      ${r.description ? `<p style="margin:0;white-space:pre-line">${esc(r.description)}</p>` : ''}
+    </section>
+    ${howRental(r.monthly_rent)}
+    ${lead ? `<section class="card stack"><div class="between"><h2 style="margin:0">طلبك</h2>${chip(lead.status)}</div>
+        <p style="margin:0">${lead.status === 'signed' ? `مبروك! العقد اتمضى. نصيبك من العمولة: <strong>${money(lead.tenant_fee)}</strong> ${lead.tenant_paid ? '(اتدفع ✓)' : '(لسه ما اتدفعش)'}`
+          : lead.status === 'lost' ? 'الطلب ده اتقفل.' : `طلبك وصل. فريق DentaCore Shift هيكلمك على رقمك <span dir="ltr">${esc(phone || '')}</span>.`}</p></section>`
+      : r.status !== 'active' ? '<div class="notice">الإعلان ده مش متاح دلوقتي.</div>'
+      : d?.status !== 'verified' ? '<div class="notice">طلب المعاينة بيتفتح بعد ما ملفك يتوثّق. <a href="#/profile">ملفي</a></div>'
+      : !phone ? '<div class="notice">اكتب رقم موبايلك في <a href="#/profile">ملفي</a> علشان نقدر نكلمك.</div>'
+      : `<section class="card stack"><h2>اطلب معاينة</h2>
+        <div><label for="rl-msg">رسالة لفريقنا (اختياري)</label><textarea id="rl-msg" maxlength="600" placeholder="امتى يناسبك تعاين؟ محتاج حاجة معينة في العيادة؟"></textarea></div>
+        <label style="display:flex;gap:10px;align-items:flex-start;color:var(--ink);font-size:14px"><input type="checkbox" id="rl-ok" style="width:22px;min-height:22px;margin-top:2px;flex:none">
+          <span>موافق على <a href="#/rental-terms" target="_blank">شروط الإيجار السنوي</a>، وإن كل التواصل مع المالك يكون عن طريق DentaCore Shift لحد الإمضاء.</span></label>
+        <button class="btn block" id="rl-go">اطلب معاينة</button></section>`}`;
+  $('rl-go')?.addEventListener('click', e => run(e.target, async () => {
+    if (!$('rl-ok').checked) throw new Error('لازم توافق على شروط الإيجار السنوي');
+    must(await sb.rpc('request_rental', { p_rental:id, p_message:$('rl-msg').value.trim() }));
+    toast('طلبك وصل، هنكلمك قريب'); viewRental(id);
+  }));
+}
+
+async function viewMyRentalLeads(){
+  shell('<div class="spin">جاري التحميل…</div>', '#/rentals');
+  const rows = must(await sb.from('rental_leads').select('*, rentals(title, area, monthly_rent)').order('created_at', { ascending:false }));
+  app.querySelector('main').innerHTML = `<a href="#/rentals">→ رجوع</a><h1>طلبات الإيجار</h1>` + (rows.map(l => `
+    <a class="card stack" href="#/rental/${l.rental_id}" style="text-decoration:none;color:inherit">
+      <div class="between"><strong>${esc(l.rentals?.title || 'إعلان')}</strong>${chip(l.status)}</div>
+      <div class="muted">${esc(l.rentals?.area || '')} · ${money(l.rentals?.monthly_rent)} في الشهر</div></a>`).join('') || '<div class="card muted">لسه ما طلبتش معاينة لأي عيادة.</div>');
+}
+
+async function viewClinicRentals(){
+  shell('<div class="spin">جاري التحميل…</div>', '#/clinic/rentals');
+  const rows = must(await sb.from('rentals').select('*').eq('owner_id', S.me.id).order('created_at', { ascending:false }));
+  const counts = await Promise.all(rows.map(r => sb.rpc('rental_interest', { p_rental:r.id }).then(x => x.data || 0)));
+  app.querySelector('main').innerHTML = `
+    <div><h1>الإيجار السنوي</h1>
+      <p class="muted" style="margin:0">اعرض عيادتك للإيجار بعقد سنة على الأقل. إحنا بنجيبلك أطباء موثّقين، وبنرتب المعاينات والتفاوض لحد الإمضاء. رقمك وعنوانك بالتفصيل مش بيظهروا لحد.</p></div>
+    <a class="btn block" href="#/clinic/rental/new">${icon.plus} اعرض عيادة للإيجار</a>
+    ${rows.map((r, i) => `<div class="card stack">
+      <div class="between"><strong>${esc(r.title)}</strong>${chip(r.status)}</div>
+      <div class="muted">${esc(r.area)} · ${money(r.monthly_rent)} في الشهر · ${counts[i].toLocaleString('ar-EG')} مهتم</div>
+      ${r.status === 'rejected' && r.reject_reason ? `<div class="notice">${esc(r.reject_reason)}</div>` : ''}
+      <div class="row"><a class="btn sec" href="#/clinic/rental/${r.id}">تعديل</a>
+        ${['pending','active'].includes(r.status) ? `<button class="btn bad" data-close="${r.id}">اقفل الإعلان</button>` : ''}</div></div>`).join('') || '<div class="card muted">ما عرضتش عيادات للإيجار لسه.</div>'}`;
+  app.querySelectorAll('[data-close]').forEach(b => b.onclick = () => run(b, async () => {
+    if (!confirm('تقفل الإعلان؟ مش هيظهر للأطباء تاني.')) return;
+    must(await sb.from('rentals').update({ status:'closed' }).eq('id', b.dataset.close)); viewClinicRentals();
+  }));
+}
+
+async function viewRentalEdit(id){
+  shell('<div class="spin">جاري التحميل…</div>', '#/clinic/rentals');
+  const r = id ? must(await sb.from('rentals').select('*').eq('id', id).single()) : null;
+  const pv = r ? (await sb.from('rental_private').select('*').eq('rental_id', id).maybeSingle()).data || {} : {};
+  const minM = DV('rental_min_months');
+  app.querySelector('main').innerHTML = `
+    <a href="#/clinic/rentals">→ رجوع</a><h1>${r ? 'تعديل الإعلان' : 'اعرض عيادة للإيجار'}</h1>
+    ${r ? `<div>${chip(r.status)} <span class="muted">تغيير السعر أو الوصف أو الصور بيرجّع الإعلان للمراجعة.</span></div>` : '<p class="muted" style="margin:0">فريقنا بيراجع الإعلان قبل ما يظهر للأطباء.</p>'}
+    <section class="card stack">
+      <div><label for="e-t">عنوان الإعلان</label><input id="e-t" maxlength="100" value="${esc(r?.title || '')}" placeholder="عيادة أسنان مجهزة بالكامل — كرسيين"></div>
+      <div class="grid2"><div><label for="e-a">المنطقة</label><input id="e-a" maxlength="80" value="${esc(r?.area || S.clinic?.area || '')}"></div>
+        <div><label for="e-r">الإيجار الشهري (جنيه)</label><input id="e-r" type="number" inputmode="numeric" value="${esc(r?.monthly_rent || '')}"></div></div>
+      <div class="grid2"><div><label for="e-m">أقل مدة للعقد (شهور)</label><input id="e-m" type="number" min="${minM}" value="${esc(r?.min_months || minM)}"></div>
+        <div><label for="e-f">التجهيز</label><select id="e-f">${furnishOpts.map(o => `<option ${r?.furnished === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div></div>
+      <div class="grid2"><div><label for="e-s">المساحة (م²)</label><input id="e-s" type="number" value="${esc(r?.size_m2 || '')}"></div>
+        <div><label for="e-ro">عدد الغرف</label><input id="e-ro" type="number" value="${esc(r?.rooms || '')}"></div></div>
+      <div><label for="e-c">عدد الكراسي</label><input id="e-c" type="number" value="${esc(r?.chairs ?? '')}"></div>
+      <div><label for="e-ft">المميزات (افصل بفاصلة)</label><input id="e-ft" value="${esc((r?.features || []).join('، '))}" placeholder="ترخيص ساري، أشعة، أوتوكلاف، دور أرضي، تكييف"></div>
+      <div><label for="e-d">وصف</label><textarea id="e-d" maxlength="1500">${esc(r?.description || '')}</textarea></div>
+    </section>
+    <section class="card stack"><h2>بيانات خاصة (لفريق DentaCore Shift بس)</h2>
+      <div><label for="e-ad">العنوان بالتفصيل</label><input id="e-ad" maxlength="300" value="${esc(pv.address || '')}"></div>
+      <div><label for="e-mp">لينك جوجل ماب</label><input id="e-mp" dir="ltr" maxlength="300" value="${esc(pv.map_link || '')}"></div></section>
+    <section class="card stack"><h2>الصور</h2>
+      ${r?.photo_paths?.length ? `<div class="thumbs">${r.photo_paths.map(x => `<img src="${esc(mediaUrl(x))}" alt="" loading="lazy">`).join('')}</div>` : ''}
+      <input id="e-ph" type="file" accept="image/*" multiple aria-label="صور العيادة"></section>
+    <section class="card stack"><h2>العمولة</h2>
+      <p style="margin:0">عمولتنا ${monthsTxt(DV('rental_commission_months'))}، وبتستحق يوم إمضاء العقد بس. بتدفع منها ${(100 - DV('rental_tenant_pct')).toLocaleString('ar-EG')}%، والمستأجر بيدفع الباقي.</p>
+      ${r ? '' : `<label style="display:flex;gap:10px;align-items:flex-start;color:var(--ink);font-size:14px"><input type="checkbox" id="e-ok" style="width:22px;min-height:22px;margin-top:2px;flex:none">
+        <span>موافق على <a href="#/rental-terms" target="_blank">شروط الإيجار السنوي</a>، وإن كل التواصل مع المستأجرين يكون عن طريق DentaCore Shift لحد الإمضاء.</span></label>`}</section>
+    <button class="btn block" id="e-save">${r ? 'حفظ' : 'ابعت الإعلان للمراجعة'}</button>`;
+  $('e-save').onclick = e => run(e.target, async () => {
+    if (!r && !$('e-ok').checked) throw new Error('لازم توافق على شروط الإيجار السنوي');
+    const num = v => { const n = parseInt(v, 10); return Number.isFinite(n) ? n : null; };
+    const row = { title:$('e-t').value.trim(), area:$('e-a').value.trim(), monthly_rent:num($('e-r').value), min_months:num($('e-m').value) || minM,
+      furnished:$('e-f').value, size_m2:num($('e-s').value), rooms:num($('e-ro').value), chairs:num($('e-c').value),
+      features:csv($('e-ft').value), description:$('e-d').value.trim() || null };
+    if (row.title.length < 3 || row.area.length < 2) throw new Error('اكتب عنوان الإعلان والمنطقة');
+    if (!(row.monthly_rent >= 500)) throw new Error('اكتب الإيجار الشهري');
+    if (row.min_months < minM) throw new Error(`أقل مدة للعقد ${minM} شهر`);
+    const files = [...$('e-ph').files].slice(0, 8);
+    if (files.length) { const ps = []; for (const f of files) ps.push(await upload('media', 'rentals', f)); row.photo_paths = [...ps, ...(r?.photo_paths || [])].slice(0, 8); }
+    let rid = r?.id;
+    if (r) must(await sb.from('rentals').update(row).eq('id', r.id));
+    else rid = must(await sb.from('rentals').insert({ ...row, owner_id:S.me.id }).select('id').single()).id;
+    must(await sb.from('rental_private').upsert({ rental_id:rid, address:$('e-ad').value.trim() || null, map_link:$('e-mp').value.trim() || null }));
+    toast(r ? 'اتحفظ' : 'الإعلان اتبعت للمراجعة'); location.hash = '#/clinic/rentals';
+  });
+}
+
+async function adminRentals(box, names, contacts, docBtn){
+  const pend = must(await sb.from('rentals').select('*').eq('status','pending').order('created_at'));
+  const leads = must(await sb.from('rental_leads').select('*, rentals(id, title, area, monthly_rent, owner_id)').order('created_at', { ascending:false }).limit(150));
+  const open = leads.filter(l => !['signed','lost'].includes(l.status));
+  const unpaid = leads.filter(l => l.status === 'signed' && !(l.tenant_paid && l.owner_paid));
+  const ids = [...pend.map(r => r.owner_id), ...leads.map(l => l.seeker_id), ...leads.map(l => l.rentals?.owner_id)];
+  const n = await names(ids), c = await contacts(ids);
+  const priv = pend.length ? Object.fromEntries(must(await sb.from('rental_private').select('*').in('rental_id', pend.map(r => r.id))).map(x => [x.rental_id, x])) : {};
+  const wa = (uid, txt, label) => { const num = waNum(c[uid]?.phone); return num ? `<a class="btn wa" style="min-height:38px" href="${esc(waHref(num, txt))}" target="_blank" rel="noopener">${icon.wa} ${label}</a>` : `<span class="muted">${label}: مفيش رقم</span>`; };
+  const steps = ['new','contacted','viewing','negotiating','lost'];
+  const leadCard = l => { const r = l.rentals || {}; return `<div class="card stack">
+    <div class="between"><strong>${esc(r.title)} · ${money(r.monthly_rent)}</strong>${chip(l.status)}</div>
+    <div class="muted">${esc(r.area)} · طلب ${dtAr(l.created_at)}</div>
+    <div>المستأجر: د. ${esc(n[l.seeker_id])} <span dir="ltr" class="muted">${esc(c[l.seeker_id]?.phone || '')}</span></div>
+    <div>المالك: د. ${esc(n[r.owner_id])} <span dir="ltr" class="muted">${esc(c[r.owner_id]?.phone || '')}</span></div>
+    ${l.message ? `<div class="notice ok">${esc(l.message)}</div>` : ''}
+    <div class="row">${wa(l.seeker_id, `أهلًا د. ${n[l.seeker_id] || ''}، معاك فريق DentaCore Shift بخصوص طلبك على «${r.title}».`, 'كلّم المستأجر')}
+      ${wa(r.owner_id, `أهلًا د. ${n[r.owner_id] || ''}، معاك فريق DentaCore Shift بخصوص إعلان «${r.title}».`, 'كلّم المالك')}</div>
+    ${l.status === 'signed' ? `
+      <div>الإيجار في العقد ${money(l.final_rent)} · العمولة ${money(l.commission)}</div>
+      <label class="row" style="color:var(--ink)"><input type="checkbox" data-paid="${l.id}|tenant_paid" ${l.tenant_paid ? 'checked' : ''} style="width:22px;min-height:22px"> المستأجر دفع ${money(l.tenant_fee)}</label>
+      <label class="row" style="color:var(--ink)"><input type="checkbox" data-paid="${l.id}|owner_paid" ${l.owner_paid ? 'checked' : ''} style="width:22px;min-height:22px"> المالك دفع ${money(l.owner_fee)}</label>`
+    : `<div class="grid2"><select id="ls-${l.id}" aria-label="الحالة">${steps.map(s => `<option value="${s}" ${l.status === s ? 'selected' : ''}>${statusLabel[s][0]}</option>`).join('')}</select>
+        <button class="btn sec" data-lsave="${l.id}">حفظ</button></div>
+      <textarea id="ln-${l.id}" maxlength="1000" placeholder="ملاحظات داخلية" aria-label="ملاحظات">${esc(l.admin_note || '')}</textarea>
+      <button class="btn" data-sign="${l.id}|${r.monthly_rent}">اتمضى العقد</button>`}</div>`; };
+  box.innerHTML = `<h2>إعلانات مستنية مراجعة (${pend.length})</h2>` + (pend.map(r => `<div class="card stack">
+      <strong>${esc(r.title)} — ${esc(r.area)}</strong>
+      <div>${money(r.monthly_rent)} في الشهر · عقد ${r.min_months} شهر · ${rentalFacts(r).map(esc).join(' · ')}</div>
+      <div class="muted">المالك: د. ${esc(n[r.owner_id])} <span dir="ltr">${esc(c[r.owner_id]?.phone || '')}</span></div>
+      <div class="muted">العنوان: ${esc(priv[r.id]?.address || '—')} ${priv[r.id]?.map_link ? `· <a href="${esc(priv[r.id].map_link)}" target="_blank" rel="noopener">الخريطة</a>` : ''}</div>
+      ${r.photo_paths.length ? `<div class="thumbs">${r.photo_paths.map(x => `<img src="${esc(mediaUrl(x))}" alt="" loading="lazy">`).join('')}</div>` : ''}
+      ${r.description ? `<p style="margin:0;white-space:pre-line" class="muted">${esc(r.description)}</p>` : ''}
+      <div class="row">${wa(r.owner_id, `أهلًا د. ${n[r.owner_id] || ''}، معاك فريق DentaCore Shift بخصوص إعلان «${r.title}».`, 'كلّم المالك')}</div>
+      <div class="row"><button class="btn" data-rv="${r.id}|1">انشر</button><button class="btn bad" data-rv="${r.id}|0">رفض</button></div></div>`).join('') || '<div class="card muted">مفيش</div>')
+    + `<h2 style="margin-top:12px">طلبات شغالة (${open.length})</h2><p class="muted">ما تدّيش رقم أو عنوان أي طرف للتاني قبل الإمضاء. رتّب المعاينة بنفسك.</p>` + (open.map(leadCard).join('') || '<div class="card muted">مفيش</div>')
+    + `<h2 style="margin-top:12px">عمولات لسه ما اتحصّلتش (${unpaid.length})</h2>` + (unpaid.map(leadCard).join('') || '<div class="card muted">مفيش</div>');
+  box.querySelectorAll('[data-rv]').forEach(b => b.onclick = () => run(b, async () => {
+    const [id, ok] = b.dataset.rv.split('|'); let reason = null;
+    if (ok === '0') { reason = prompt('سبب الرفض (هيظهر لصاحب الإعلان):'); if (reason === null) return; }
+    must(await sb.rpc('admin_review_rental', { p_rental:id, p_ok:ok === '1', p_reason:reason })); viewAdmin('rentals');
+  }));
+  box.querySelectorAll('[data-lsave]').forEach(b => b.onclick = () => run(b, async () => {
+    const id = b.dataset.lsave;
+    must(await sb.from('rental_leads').update({ status:$('ls-' + id).value, admin_note:$('ln-' + id).value.trim() || null }).eq('id', id)); toast('اتحفظ'); viewAdmin('rentals');
+  }));
+  box.querySelectorAll('[data-sign]').forEach(b => b.onclick = () => run(b, async () => {
+    const [id, rent] = b.dataset.sign.split('|');
+    const v = prompt('الإيجار الشهري المكتوب في العقد (جنيه):', rent); if (v === null) return;
+    const fr = parseInt(v, 10); if (!(fr > 0)) throw new Error('رقم غلط');
+    if (!confirm(`العمولة ${money(fr * DV('rental_commission_months'))}: المستأجر ${money(rentFee(fr))} والمالك ${money(ownerFee(fr))}. تأكيد؟`)) return;
+    must(await sb.rpc('admin_sign_rental', { p_lead:id, p_final_rent:fr })); viewAdmin('rentals');
+  }));
+  box.querySelectorAll('[data-paid]').forEach(x => x.onchange = () => run(null, async () => {
+    const [id, col] = x.dataset.paid.split('|');
+    must(await sb.from('rental_leads').update({ [col]:x.checked }).eq('id', id)); toast('اتحفظ');
+  }));
+}
+
+/* ---------- الراوتر ---------- */
+async function route(){
+  if (!configured) { app.innerHTML = '<main><div class="card" style="margin-top:24px">الموقع محتاج يتربط بـ Supabase: حط Project URL و anon key في أول الملف.</div></main>'; return; }
+  const h = location.hash.replace(/^#/, '') || '/';
+  const [, p1, p2, p3] = h.split('/');
+  if (h.startsWith('/reset')) return viewReset();
+  if (legalTitles[p1]) return viewLegal(p1);
+  if (!S.session) return viewAuth(p1 === 'signup' ? 'signup' : 'login');
+  if (!S.me) { try { await loadMe(); } catch(e) { toast(errMsg(e)); return; } }
+  const r = S.me.role;
+  try {
+    if (r === 'doctor') {
+      if (p1 === 'shift' && p2) return await viewShift(p2);
+      if (p1 === 'bookings') return await viewBookings();
+      if (p1 === 'booking' && p2) return await viewBooking(p2);
+      if (p1 === 'profile') return await viewProfile();
+      if (p1 === 'rentals') return await viewRentals();
+      if (p1 === 'rental' && p2) return await viewRental(p2);
+      if (p1 === 'my-rentals') return await viewMyRentalLeads();
+      return await viewShifts();
+    }
+    if (r === 'clinic') {
+      if (p1 === 'clinic' && p2 === 'edit') return await viewClinicEdit();
+      if (p1 === 'clinic' && p2 === 'new') return viewNewShift();
+      if (p1 === 'clinic' && p2 === 'booking' && p3) return await viewClinicBooking(p3);
+      if (p1 === 'hire' && p2) return await viewHire(p2);
+      if (p1 === 'clinic' && p2 === 'rentals') return await viewClinicRentals();
+      if (p1 === 'clinic' && p2 === 'rental' && p3) return await viewRentalEdit(p3 === 'new' ? null : p3);
+      return await viewClinic();
+    }
+    if (r === 'admin') return await viewAdmin();
+  } catch(e) { toast(errMsg(e)); console.error(e); }
+}
+window.addEventListener('hashchange', route);
+
+if (configured) {
+  sb.auth.onAuthStateChange((ev, session) => {
+    const changed = (S.session?.user?.id) !== (session?.user?.id);
+    S.session = session;
+    if (ev === 'PASSWORD_RECOVERY') { location.hash = '#/reset'; return; }
+    if (changed) { S.me = null; route(); }
+  });
+  sb.auth.getSession().then(({ data }) => { S.session = data.session; route(); });
+} else route();
+
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body>
+</html>
