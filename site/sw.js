@@ -1,5 +1,5 @@
 // خدمة بسيطة: بتحفظ ملفات الموقع علشان يفتح بسرعة، ومش بتخزن أي بيانات من Supabase
-const CACHE = 'shift-v6';
+const CACHE = 'shift-v7';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {

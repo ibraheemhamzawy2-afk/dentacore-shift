@@ -29,9 +29,11 @@ supabase/
   01_setup.sql              schema, enums, RLS, triggers, RPCs, storage policies, cron
   02_rentals.sql            annual clinic rentals: rentals, rental_private, rental_leads + RPCs
   03_direct_dealing.sql     introduction-fee quote (hire_quote / request_hire)
+  04_privacy_links.sql      clinic name hidden until payment confirmed (column grants + clinic_names RPC),
+                            location sent by admin via WhatsApp, public links (InstaPay / Facebook / Instagram)
 ```
 
-Run the SQL files in order in Supabase SQL Editor. All three are idempotent.
+Run the SQL files in order in Supabase SQL Editor. All are idempotent.
 
 ## Security model (please review)
 

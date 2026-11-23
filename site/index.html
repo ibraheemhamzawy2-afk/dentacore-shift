@@ -45,6 +45,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--gold);outline-of
 .btn.sec{background:#fff;color:var(--ink);border:1px solid #CBD2DA}
 .btn.bad{background:#fff;color:var(--bad);border:1px solid #F1B5AE}
 .btn.block{width:100%}
+.social{display:flex;gap:10px;justify-content:center;margin-bottom:12px}.social a{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--ink);text-decoration:none;background:#fff;font-size:13px}
 .btn.wa{background:#1F8F55;color:#fff}.btn.wa:hover{background:#18784A}
 .btn:disabled{opacity:.55;cursor:not-allowed}
 .chip{font-size:12px;border-radius:8px;padding:3px 8px;background:#EEF1F5;color:#2D3748;display:inline-block}
@@ -82,7 +83,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 4px;b
 const SUPABASE_URL  = 'https://umppraumetxvrotxuyph.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_U1dAPqOTaIvqeopGgSjt-w_dZpQFbeF';
 // بيانات بتظهر في صفحات السياسات
-const LEGAL = { owner:'د. إبراهيم حمزاوي', email:'[إيميل الدعم]', whatsapp:'[رقم واتساب الدعم]', updated:'١١ نوفمبر ٢٠٢٦', version:'2026-11-11' };
+const LEGAL = { owner:'د. إبراهيم حمزاوي', email:'[إيميل الدعم]', whatsapp:'[رقم واتساب الدعم]', updated:'٢٣ نوفمبر ٢٠٢٦', version:'2026-11-23' };
 /* ======================================================================== */
 
 const configured = SUPABASE_URL.startsWith('https://');
@@ -111,6 +112,9 @@ const icon = {
   shield:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg>',
   key:'<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></svg>',
   wa:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.9 11.9 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2s.2-1.1.1-1.2-.2-.2-.4-.3z"/></svg>',
+  fb:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.5 1.6-1.5h1.7V4.4c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1v2.4H7.7V14h2.7v8z"/></svg>',
+  ig:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>',
+  copy:'<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
   clock:'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
 };
 const statusLabel = {
@@ -154,6 +158,13 @@ async function openDoc(path){
 /* ---------- السياسات ---------- */
 const DEF = { commission_fixed_pct:15, commission_percent_pct:5, commission_min:100, monthly_cap_pair:600, hire_fee:2000, hire_min:1000,
   hire_protect_months:6, hold_hours:3, cancel_free_hours:24, rental_min_months:12, rental_commission_months:1, rental_tenant_pct:50, rental_protect_months:12 };
+const safeUrl = u => { const v = String(u || '').trim(); return /^https:\/\/[^\s"'<>]+$/i.test(v) ? v : ''; };
+async function clinicNames(ids){
+  const u = [...new Set(ids.filter(Boolean))]; if (!u.length) return {};
+  const r = (await sb.rpc('clinic_names', { p_ids:u })).data || [];
+  return Object.fromEntries(r.map(x => [x.id, x.name]));
+}
+const clinicLabel = (names, c) => names[c?.id] ? `${esc(names[c.id])} — ${esc(c.area)}` : `عيادة موثّقة في ${esc(c?.area || '')}`;
 const DV = k => Number(S.settings?.[k] ?? DEF[k]);
 const waNum = n => { let d = String(n || '').replace(/[^0-9]/g, ''); if (d.startsWith('00')) d = d.slice(2); if (d.startsWith('0')) d = '2' + d; return d.length >= 11 ? d : ''; };
 const waHref = (num, text) => `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
@@ -209,6 +220,7 @@ function legalBody(kind){
     sec('٦. الدفع', [
       'كل المدفوعات بتمر عن طريق المنصة بس، بتحويل إنستاباي أو محفظة على البيانات المكتوبة جوه المنصة. المنصة مش مسؤولة عن أي مبلغ يتدفع بطريقة تانية أو لحساب تاني.',
       `الحجز بيتأكد بعد ما المنصة تراجع التحويل. لو التحويل ما وصلش خلال ${V('hold_hours')} ساعات من الحجز، الحجز بيتلغي لوحده.`,
+      'اسم العيادة بيظهر للطبيب بعد تأكيد التحويل بس. وبعدها فريق المنصة بيبعتله لوكيشن العيادة وتفاصيل الوصول على واتساب، وبيتابع التنسيق بين الطرفين.',
       'السعر الثابت: الطبيب بيدفع سعر الشيفت كامل مقدمًا، وكل دخل مرضاه ليه.',
       'نظام النسبة: الطبيب بيدفع الحد الأدنى مقدمًا. بعد الشيفت، لو نصيب العيادة طلع أكبر، بيدفع الفرق خلال 48 ساعة.',
       'عمولة المنصة بتتخصم من نصيب العيادة. الطبيب مش بيدفع أي رسوم فوق السعر المعروض.',
@@ -256,8 +268,8 @@ function legalBody(kind){
       'نتواصل معاك بخصوص حسابك وحجوزاتك.',
       'نلتزم بالقانون وبالضرايب.']),
     sec('٣. مين يشوف إيه', [
-      'اسمك، ومنطقتك، وتخصصاتك، وتقييماتك، وصور الحالات أو العيادة: بيشوفها المستخدمين المسجلين في المنصة.',
-      'رقم الموبايل وعنوان العيادة بالتفصيل: بيشوفهم الطرف التاني في الحجز المؤكد بس، ومن يوم قبل الشيفت.',
+      'اسمك، ومنطقتك، وتخصصاتك، وتقييماتك، وصور الحالات أو العيادة: بيشوفها المستخدمين المسجلين في المنصة. اسم العيادة مستثنى: بيظهر للطبيب بعد تأكيد تحويل الحجز بس.',
+      'عنوان العيادة ولوكيشنها: فريق المنصة بيبعتهم للطبيب على واتساب بعد تأكيد الحجز. ورقم الطبيب بيظهر للعيادة في الحجز المؤكد، من يوم قبل الشيفت.',
       'فواتير الشيفت: بيشوفها الطبيب والعيادة اللي في الحجز، وفريق المنصة.',
       'مستندات التوثيق، وصور التحويلات، وأرقام الحسابات: بيشوفها فريق المنصة المسؤول بس.',
       'في الإيجار السنوي: رقم المالك والمستأجر وعنوان العيادة بالتفصيل بيشوفهم فريق المنصة بس. بنديهم للطرف التاني لما نرتب المعاينة أو الإمضاء، بعد موافقتك.']),
@@ -377,8 +389,14 @@ function viewLegal(kind){
     ${legalBody(kind)}`, '');
   window.scrollTo(0, 0);
 }
-const legalLinks = () => `<footer style="padding:20px 16px 8px;text-align:center;font-size:12px;color:var(--muted);display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-  ${Object.entries(legalTitles).map(([k,t]) => `<a href="#/${k}" style="color:var(--muted)">${t}</a>`).join('')}</footer>`;
+const socialLinks = () => {
+  const L = { ...(S.links || {}), ...(S.settings || {}) };
+  const wa = waNum(L.support_whatsapp), fb = safeUrl(L.facebook_url), ig = safeUrl(L.instagram_url);
+  const a = [wa && [`https://wa.me/${wa}`, 'wa', 'واتساب'], fb && [fb, 'fb', 'فيسبوك'], ig && [ig, 'ig', 'إنستجرام']].filter(Boolean);
+  return a.length ? `<div class="social">${a.map(([h,i,t]) => `<a href="${esc(h)}" target="_blank" rel="noopener" aria-label="${t}">${icon[i]}<span>${t}</span></a>`).join('')}</div>` : '';
+};
+const legalLinks = () => `<footer style="padding:20px 16px 8px;text-align:center;font-size:12px;color:var(--muted)">${socialLinks()}<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+  ${Object.entries(legalTitles).map(([k,t]) => `<a href="#/${k}" style="color:var(--muted)">${t}</a>`).join('')}</div></footer>`;
 
 /* ---------- الهيكل ---------- */
 function shell(body, active){
@@ -404,7 +422,7 @@ async function loadMe(){
   S.me = must(await sb.from('profiles').select('*').eq('id', uid).single());
   S.contact = (await sb.from('contacts').select('*').eq('user_id', uid).maybeSingle()).data || {};
   if (S.me.role === 'doctor') S.doctor = must(await sb.from('doctors').select('*').eq('id', uid).single());
-  if (S.me.role === 'clinic') S.clinic = (await sb.from('clinics').select('*').eq('owner_id', uid).maybeSingle()).data;
+  if (S.me.role === 'clinic') S.clinic = ((await sb.rpc('clinic_full')).data || [])[0] || null;
   const st = must(await sb.from('settings').select('*'));
   S.settings = Object.fromEntries(st.map(x => [x.key, x.value]));
 }
@@ -475,7 +493,7 @@ function viewReset(){
 async function viewShifts(){
   shell('<div class="spin">جاري التحميل…</div>', '#/shifts');
   const f = JSON.parse(sessionStorage.getItem('flt') || '{}');
-  let q = sb.from('shifts').select('*, clinics(name, area, equipment, photo_paths)').eq('status','open')
+  let q = sb.from('shifts').select('*, clinics(id, area, equipment, photo_paths)').eq('status','open')
     .order('shift_date').order('start_time').limit(60);
   if (f.mode) q = q.eq('mode', f.mode);
   if (f.date) q = q.eq('shift_date', f.date);
@@ -497,7 +515,7 @@ async function viewShifts(){
     </div>
     ${rows.length ? rows.map(s => `
       <article class="card stack">
-        <div class="between"><div><strong>${esc(s.clinics?.name)} — ${esc(s.clinics?.area)}</strong>
+        <div class="between"><div><strong>عيادة في ${esc(s.clinics?.area)}</strong>
           <div class="muted">${dateAr(s.shift_date)} · ${timeAr(s.start_time)} – ${timeAr(s.end_time)}</div></div>
           <span class="chip ok">عيادة موثّقة</span></div>
         <div class="row">${(s.includes.length ? s.includes : s.clinics?.equipment || []).slice(0,5).map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
@@ -509,7 +527,7 @@ async function viewShifts(){
 
 async function viewShift(id){
   shell('<div class="spin">جاري التحميل…</div>', '#/shifts');
-  const s = (await sb.from('shifts').select('*, clinics(id, name, area, equipment, photo_paths, owner_id)').eq('id', id).maybeSingle()).data;
+  const s = (await sb.from('shifts').select('*, clinics(id, area, equipment, photo_paths, owner_id)').eq('id', id).maybeSingle()).data;
   if (!s) { app.querySelector('main').innerHTML = '<div class="card">الشيفت ده مش متاح.</div>'; return; }
   const revs = (await sb.from('reviews').select('rating').eq('target_id', s.clinics.owner_id)).data || [];
   const avg = revs.length ? (revs.reduce((a,r) => a + r.rating, 0) / revs.length).toFixed(1) : null;
@@ -518,13 +536,13 @@ async function viewShift(id){
     <a href="#/shifts">→ رجوع</a>
     <section class="card stack">
       ${s.clinics.photo_paths?.length ? `<div class="thumbs">${s.clinics.photo_paths.slice(0,3).map(p => `<img src="${esc(mediaUrl(p))}" alt="صورة العيادة" loading="lazy">`).join('')}</div>` : ''}
-      <div class="between"><h1 style="font-size:18px">${esc(s.clinics.name)} — ${esc(s.clinics.area)}</h1><span class="chip ok">موثّقة</span></div>
+      <div class="between"><h1 style="font-size:18px">عيادة في ${esc(s.clinics.area)}</h1><span class="chip ok">موثّقة</span></div>
       <div class="muted">${dateAr(s.shift_date)} · ${timeAr(s.start_time)} – ${timeAr(s.end_time)}</div>
       <div class="muted">${avg ? `تقييم الأطباء: ${avg} من 5 (${revs.length})` : 'لسه مفيش تقييمات'}</div>
     </section>
     <section class="card"><h2>الشيفت يشمل</h2><div class="row">${inc.map(t => `<span class="chip">${esc(t)}</span>`).join('') || '<span class="muted">مش محدد</span>'}</div>
       ${s.notes ? `<p class="muted">${esc(s.notes)}</p>` : ''}
-      <p class="muted" style="margin-bottom:0">العنوان بالتفصيل ورقم العيادة بيظهروا بعد تأكيد الحجز، من يوم قبل الشيفت.</p></section>
+      <p class="muted" style="margin-bottom:0">اسم العيادة بيظهرلك بعد ما التحويل يتأكد، وفريق DentaCore Shift بيبعتلك اللوكيشن على واتساب.</p></section>
     <section class="card stack"><h2>الدفع</h2>
       <div class="price">${priceText(s)}</div><div class="muted">${modeText(s)}</div>
       <p class="muted" style="margin:0">${s.mode === 'fixed'
@@ -540,23 +558,26 @@ async function viewShift(id){
 }
 
 async function myBookings(){
-  return must(await sb.from('bookings').select('*, shifts(*, clinics(name, area))').order('created_at', { ascending:false }).limit(100));
+  const rows = must(await sb.from('bookings').select('*, shifts(*, clinics(id, area))').order('created_at', { ascending:false }).limit(100));
+  S.cnames = await clinicNames(rows.map(b => b.shifts?.clinics?.id));
+  return rows;
 }
 async function viewBookings(){
   shell('<div class="spin">جاري التحميل…</div>', '#/bookings');
   const rows = await myBookings();
   app.querySelector('main').innerHTML = `<h1>حجوزاتي</h1>` + (rows.length ? rows.map(b => `
     <a class="card stack" style="text-decoration:none;color:inherit" href="#/booking/${b.id}">
-      <div class="between"><strong>${esc(b.shifts.clinics.name)} — ${esc(b.shifts.clinics.area)}</strong>${chip(b.status)}</div>
+      <div class="between"><strong>${clinicLabel(S.cnames, b.shifts.clinics)}</strong>${chip(b.status)}</div>
       <div class="muted">${dateAr(b.shifts.shift_date)} · ${timeAr(b.shifts.start_time)} – ${timeAr(b.shifts.end_time)}</div>
     </a>`).join('') : '<div class="card muted">لسه ما حجزتش شيفتات. <a href="#/shifts">دوّر على شيفت</a></div>');
 }
 
 function payBox(amount, idPrefix, note){
   return `<div class="card stack">
-    <h2>حوّل ${money(amount)} بإنستاباي</h2>
-    <div>عنوان الدفع: <strong dir="ltr">${esc(S.settings.instapay_address)}</strong></div>
-    <div>أو محفظة: <strong dir="ltr">${esc(S.settings.wallet_number)}</strong></div>
+    <h2>حوّل ${money(amount)}</h2>
+    ${safeUrl(S.settings.instapay_link) ? `<a class="btn block" href="${esc(safeUrl(S.settings.instapay_link))}" target="_blank" rel="noopener">ادفع بإنستاباي ←</a>` : ''}
+    ${S.settings.instapay_address ? `<div class="between"><span>عنوان إنستاباي: <strong dir="ltr">${esc(S.settings.instapay_address)}</strong></span><button class="btn sec" style="min-height:36px" data-copy="${esc(S.settings.instapay_address)}">${icon.copy} نسخ</button></div>` : ''}
+    ${S.settings.wallet_number ? `<div class="between"><span>أو محفظة: <strong dir="ltr">${esc(S.settings.wallet_number)}</strong></span><button class="btn sec" style="min-height:36px" data-copy="${esc(S.settings.wallet_number)}">${icon.copy} نسخ</button></div>` : ''}
     ${note ? `<div class="notice">${esc(note)}</div>` : ''}
     <div><label for="${idPrefix}-ref">رقم العملية (المرجع) من إنستاباي</label><input id="${idPrefix}-ref" dir="ltr" maxlength="60"></div>
     <div><label for="${idPrefix}-file">صورة التحويل</label><input id="${idPrefix}-file" type="file" accept="image/*,application/pdf"></div>
@@ -566,26 +587,25 @@ function payBox(amount, idPrefix, note){
 
 async function viewBooking(id){
   shell('<div class="spin">جاري التحميل…</div>', '#/bookings');
-  const b = (await sb.from('bookings').select('*, shifts(*, clinics(name, area, owner_id))').eq('id', id).maybeSingle()).data;
+  const b = (await sb.from('bookings').select('*, shifts(*, clinics(id, area, owner_id))').eq('id', id).maybeSingle()).data;
   if (!b) { app.querySelector('main').innerHTML = '<div class="card">الحجز غير موجود.</div>'; return; }
   const s = b.shifts;
   const inv = s.mode === 'percent' ? must(await sb.from('invoices').select('*').eq('booking_id', id).order('created_at')) : [];
   const total = inv.reduce((a,x) => a + x.amount, 0);
-  const contact = ['confirmed','settlement_due','settlement_review'].includes(b.status) ? ((await sb.rpc('booking_contact', { p_booking:id })).data || [])[0] : null;
+  const cn = await clinicNames([s.clinics?.id]);
   const reviewed = (await sb.from('reviews').select('id').eq('booking_id', id).eq('author_id', S.session.user.id)).data?.length;
   const started = new Date(`${s.shift_date}T${s.start_time}+02:00`) <= new Date();
   let body = `<a href="#/bookings">→ حجوزاتي</a>
-    <section class="card stack"><div class="between"><strong>${esc(s.clinics.name)} — ${esc(s.clinics.area)}</strong>${chip(b.status)}</div>
+    <section class="card stack"><div class="between"><strong>${clinicLabel(cn, s.clinics)}</strong>${chip(b.status)}</div>
       <div class="muted">${dateAr(s.shift_date)} · ${timeAr(s.start_time)} – ${timeAr(s.end_time)}</div>
       <div><span class="price">${priceText(s)}</span> <span class="muted">${modeText(s)}</span></div></section>`;
   if (b.status === 'pending_payment') body += `<div class="notice">لازم تحوّل قبل ${dtAr(b.hold_expires_at)}، وإلا الحجز بيتلغي لوحده.</div>` + payBox(b.amount_due, 'p', b.admin_note);
   if (b.status === 'payment_review') body += `<div class="card notice ok">استلمنا رقم العملية وبنراجعه. هيوصلك التأكيد هنا.</div>`;
   if (['confirmed','settlement_due','settlement_review'].includes(b.status)) {
-    body += contact ? `<section class="card stack"><h2>بيانات العيادة</h2>
-        <div>العنوان: ${esc(contact.address || '—')}</div>
-        ${contact.map_link ? `<a href="${esc(contact.map_link)}" target="_blank" rel="noopener">فتح الخريطة</a>` : ''}
-        ${contact.clinic_phone ? `<a class="btn sec" href="tel:${esc(contact.clinic_phone)}">اتصال بالعيادة</a>` : ''}</section>`
-      : `<div class="card muted">العنوان ورقم العيادة بيظهروا هنا من يوم قبل الشيفت.</div>`;
+    const swa = waNum(S.settings?.support_whatsapp);
+    body += `<section class="card stack"><h2>اللوكيشن</h2>
+        <p style="margin:0">${b.location_sent ? 'فريق DentaCore Shift بعتلك لوكيشن العيادة على واتساب ✓' : 'فريق DentaCore Shift هيبعتلك لوكيشن العيادة وتفاصيل الوصول على واتساب.'}</p>
+        ${swa ? `<a class="btn wa block" href="${esc(waHref(swa, `استفسار عن حجز شيفت — ${cn[s.clinics?.id] || ''} — ${s.shift_date}`))}" target="_blank" rel="noopener">${icon.wa} كلّم فريقنا على واتساب</a>` : ''}</section>`;
   }
   if (b.status === 'confirmed' && s.mode === 'percent') body += `
     <section class="card stack"><h2>فواتير الشيفت</h2>
@@ -705,12 +725,12 @@ async function viewClinicEdit(){
       <div><label for="c-name">اسم العيادة (زي الترخيص)</label><input id="c-name" value="${esc(c?.name || '')}" maxlength="80"></div>
       <div><label for="c-area">المنطقة</label><input id="c-area" value="${esc(c?.area || S.me.area || '')}" maxlength="80" placeholder="مدينة نصر — الحي السابع"></div>
       <div><label for="c-eq">التجهيزات (افصل بفاصلة)</label><input id="c-eq" value="${esc((c?.equipment || []).join('، '))}" placeholder="أشعة، روتاري، أبكس، أوتوكلاف، مساعدة"></div>
-      <div><label for="c-addr">العنوان بالتفصيل (يظهر للطبيب بعد الحجز فقط)</label><input id="c-addr" value="${esc(priv.address || '')}" maxlength="300"></div>
+      <div><label for="c-addr">العنوان بالتفصيل (فريقنا بيبعته للطبيب بعد تأكيد الحجز)</label><input id="c-addr" value="${esc(priv.address || '')}" maxlength="300"></div>
       <div><label for="c-map">لينك جوجل ماب</label><input id="c-map" dir="ltr" value="${esc(priv.map_link || '')}"></div>
       <div><label for="c-ip">إنستاباي أو محفظة العيادة (لتحويل نصيبك)</label><input id="c-ip" dir="ltr" value="${esc(S.contact.instapay || '')}"></div>
     </section>
     ${c ? waVerifyBox('clinic', c.status, [`العيادة: ${c.name} — ${c.area}`, `صاحبها: د. ${S.me.full_name}`]) : '<div class="notice">احفظ بيانات العيادة الأول، وبعدها هيظهرلك زرار تبعت منه تسجيل النقابة أو الترخيص على واتساب.</div>'}
-    <section class="card stack"><h2>صور العيادة</h2>
+    <section class="card stack"><h2>صور العيادة</h2><p class="muted" style="margin:0">الصور بتظهر للأطباء قبل الحجز، فما ترفعش صور فيها اسم العيادة أو اللافتة.</p>
       ${c?.photo_paths?.length ? `<div class="thumbs">${c.photo_paths.map(x => `<img src="${esc(mediaUrl(x))}" alt="صورة العيادة" loading="lazy">`).join('')}</div>` : ''}
       <div><label for="c-ph">صور العيادة والكرسي</label><input id="c-ph" type="file" accept="image/*" multiple></div>
     </section>
@@ -873,7 +893,7 @@ async function viewHire(id){
 
 /* ---------- الأدمن ---------- */
 async function viewAdmin(tab = 'verify'){
-  const tabs = [['verify','التوثيق'],['pay','التحويلات'],['refund','الاسترداد'],['payout','تحويل العيادات'],['rentals','الإيجار'],['watch','مراقبة'],['settings','الإعدادات']];
+  const tabs = [['verify','التوثيق'],['pay','التحويلات'],['refund','الاسترداد'],['loc','اللوكيشن'],['payout','تحويل العيادات'],['rentals','الإيجار'],['watch','مراقبة'],['settings','الإعدادات']];
   shell(`<h1>الإدارة</h1><div class="tabs" role="tablist">${tabs.map(([k,t]) => `<button role="tab" data-tab="${k}" aria-selected="${k === tab}">${t}</button>`).join('')}</div><div id="adm"><div class="spin">جاري التحميل…</div></div>`, '#/admin');
   app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => viewAdmin(b.dataset.tab));
   const box = $('adm');
@@ -883,7 +903,7 @@ async function viewAdmin(tab = 'verify'){
 
   if (tab === 'verify') {
     const docs = must(await sb.from('doctors').select('*').eq('status','pending'));
-    const cls = must(await sb.from('clinics').select('*').eq('status','pending'));
+    const cls = must(await sb.rpc('clinic_full')).filter(c => c.status === 'pending');
     const n = await names([...docs.map(d => d.id), ...cls.map(c => c.owner_id)]), ct = await contacts([...docs.map(d => d.id), ...cls.map(c => c.owner_id)]);
     const wa = (uid, txt) => { const num = waNum(ct[uid]?.phone); return num ? `<a class="btn wa" style="min-height:38px" href="${esc(waHref(num, txt))}" target="_blank" rel="noopener">${icon.wa} واتساب</a>` : '<span class="muted">مفيش رقم</span>'; };
     box.innerHTML = `<p class="muted">الورق بيوصلك على واتساب. الطبيب: كارنيه النقابة أو ترخيص مزاولة المهنة. العيادة: تسجيلها في النقابة أو ترخيصها. راجع الورقة، وبعدين وثّق أو ارفض. امسح صور الورق من المحادثة بعد 30 يوم من التوثيق.</p><h2>أطباء (${docs.length})</h2>` + (docs.map(d => `<div class="card stack">
@@ -904,13 +924,14 @@ async function viewAdmin(tab = 'verify'){
   }
 
   if (tab === 'pay') {
-    const bk = must(await sb.from('bookings').select('*, shifts(shift_date, start_time, clinics(name))').in('status',['payment_review','settlement_review']).order('created_at'));
+    const bk = must(await sb.from('bookings').select('*, shifts(shift_date, start_time, clinic_id)').in('status',['payment_review','settlement_review']).order('created_at'));
+    const bcn = await clinicNames(bk.map(b => b.shifts.clinic_id));
     const hs = must(await sb.from('hires').select('*').eq('status','payment_review'));
     const n = await names([...bk.map(b => b.doctor_id), ...hs.map(h => h.doctor_id)]);
     box.innerHTML = `<p class="muted">طابق رقم العملية والمبلغ مع كشف حسابك في البنك قبل التأكيد — ما تعتمدش على الصورة لوحدها.</p>` +
       (bk.map(b => { const settle = b.status === 'settlement_review'; return `<div class="card stack">
         <div class="between"><strong>${settle ? 'تسوية' : 'حجز'} · ${money(settle ? b.settle_due : b.amount_due)}</strong>${chip(b.status)}</div>
-        <div class="muted">د. ${esc(n[b.doctor_id])} ← ${esc(b.shifts.clinics.name)} · ${dateAr(b.shifts.shift_date)}</div>
+        <div class="muted">د. ${esc(n[b.doctor_id])} ← ${esc(bcn[b.shifts.clinic_id] || '')} · ${dateAr(b.shifts.shift_date)}</div>
         <div>رقم العملية: <strong dir="ltr">${esc(settle ? b.settle_ref : b.pay_ref)}</strong></div>
         <div class="row">${docBtn(settle ? b.settle_proof_path : b.proof_path,'صورة التحويل')}</div>
         <div class="row"><button class="btn" data-p="${settle ? 's' : 'b'}|${b.id}|1">تأكيد</button><button class="btn bad" data-p="${settle ? 's' : 'b'}|${b.id}|0">رفض</button></div></div>`; }).join('') || '') +
@@ -938,7 +959,7 @@ async function viewAdmin(tab = 'verify'){
   }
 
   if (tab === 'payout') {
-    const cls = must(await sb.from('clinics').select('*').eq('status','verified'));
+    const cls = must(await sb.rpc('clinic_full')).filter(c => c.status === 'verified');
     const c = await contacts(cls.map(x => x.owner_id));
     const bals = await Promise.all(cls.map(x => sb.rpc('clinic_balance', { p_clinic:x.id }).then(r => (r.data || [])[0])));
     const list = cls.map((x, i) => ({ ...x, bal:bals[i] })).filter(x => x.bal?.balance > 0);
@@ -955,16 +976,34 @@ async function viewAdmin(tab = 'verify'){
 
   if (tab === 'rentals') await adminRentals(box, names, contacts, docBtn);
 
+  if (tab === 'loc') {
+    const todayIso = new Date(Date.now() + 2*36e5).toISOString().slice(0,10);
+    const bk = must(await sb.from('bookings').select('*, shifts(shift_date, start_time, end_time, clinic_id)').in('status',['confirmed','settlement_due','settlement_review']).order('created_at'))
+      .filter(b => b.shifts.shift_date >= todayIso).sort((a, b) => (a.location_sent - b.location_sent) || a.shifts.shift_date.localeCompare(b.shifts.shift_date));
+    const cids = bk.map(b => b.shifts.clinic_id);
+    const [n, ct, cn] = await Promise.all([names(bk.map(b => b.doctor_id)), contacts(bk.map(b => b.doctor_id)), clinicNames(cids)]);
+    const pv = cids.length ? Object.fromEntries(must(await sb.from('clinic_private').select('*').in('clinic_id', [...new Set(cids)])).map(x => [x.clinic_id, x])) : {};
+    box.innerHTML = `<p class="muted">بعد تأكيد التحويل، ابعت للطبيب اسم العيادة واللوكيشن على واتساب، وبعدين علّم «اتبعت».</p>` + (bk.map(b => {
+      const s = b.shifts, p = pv[s.clinic_id] || {}, num = waNum(ct[b.doctor_id]?.phone);
+      const msg = [`أهلًا د. ${n[b.doctor_id] || ''}، معاك فريق DentaCore Shift.`, `حجزك اتأكد ✓`, `العيادة: ${cn[s.clinic_id] || ''}`, `الميعاد: ${dateAr(s.shift_date)} · ${timeAr(s.start_time)} – ${timeAr(s.end_time)}`,
+        p.address ? `العنوان: ${p.address}` : '', p.map_link ? `اللوكيشن: ${p.map_link}` : '', 'لو محتاج أي حاجة كلّمنا هنا.'].filter(Boolean).join('\n');
+      return `<div class="card stack"><div class="between"><strong>د. ${esc(n[b.doctor_id])} ← ${esc(cn[s.clinic_id] || '')}</strong>${b.location_sent ? '<span class="chip ok">اتبعت</span>' : '<span class="chip warn">لسه</span>'}</div>
+        <div class="muted">${dateAr(s.shift_date)} · ${timeAr(s.start_time)} · ${esc(p.address || 'مفيش عنوان مسجّل')}</div>
+        <div class="row">${num ? `<a class="btn wa" style="min-height:38px" href="${esc(waHref(num, msg))}" target="_blank" rel="noopener">${icon.wa} ابعت اللوكيشن</a>` : '<span class="muted">مفيش رقم للطبيب</span>'}
+          <button class="btn sec" data-loc="${b.id}|${b.location_sent ? 0 : 1}">${b.location_sent ? 'رجّعها لسه' : 'اتبعت ✓'}</button></div></div>`; }).join('') || '<div class="card muted">مفيش حجوزات مؤكدة جاية.</div>');
+    box.querySelectorAll('[data-loc]').forEach(x => x.onclick = () => run(x, async () => {
+      const [id, v] = x.dataset.loc.split('|'); must(await sb.rpc('admin_location_sent', { p_booking:id, p_sent:v === '1' })); viewAdmin('loc'); }));
+  }
+
   if (tab === 'watch') {
     const todayIso = new Date(Date.now() + 2*36e5).toISOString().slice(0,10);
-    const stale = must(await sb.from('bookings').select('*, shifts(shift_date, start_time, clinics(name))').eq('status','confirmed').order('created_at'))
+    const stale = must(await sb.from('bookings').select('*, shifts(shift_date, start_time, clinic_id)').eq('status','confirmed').order('created_at'))
       .filter(b => b.shifts.shift_date < todayIso);
-    const sn = await names(stale.map(b => b.doctor_id));
+    const sn = await names(stale.map(b => b.doctor_id)), scn = await clinicNames(stale.map(b => b.shifts.clinic_id));
     const pairs = must(await sb.from('admin_pairs').select('*'));
-    const cls = pairs.length ? must(await sb.from('clinics').select('id, name').in('id', pairs.map(p => p.clinic_id))) : [];
-    const cn = Object.fromEntries(cls.map(x => [x.id, x.name])), n = await names(pairs.map(p => p.doctor_id));
+    const cn = await clinicNames(pairs.map(p => p.clinic_id)), n = await names(pairs.map(p => p.doctor_id));
     box.innerHTML = `<h2>شيفتات فاتت ولسه ما اتقفلتش (${stale.length})</h2><p class="muted">كلّم العيادة واتأكد: الطبيب حضر ولا لأ.</p>` +
-      (stale.map(b => `<div class="card stack"><strong>د. ${esc(sn[b.doctor_id])} ← ${esc(b.shifts.clinics.name)}</strong>
+      (stale.map(b => `<div class="card stack"><strong>د. ${esc(sn[b.doctor_id])} ← ${esc(scn[b.shifts.clinic_id] || '')}</strong>
         <div class="muted">${dateAr(b.shifts.shift_date)} · ${timeAr(b.shifts.start_time)}</div>
         <div class="row"><button class="btn" data-fin="${b.id}">حضر — اقفل الشيفت</button><button class="btn bad" data-ns="${b.id}">ما حضرش</button></div></div>`).join('') || '<div class="card muted">مفيش.</div>') +
       `<h2 style="margin-top:12px">احتمال اتفاق من برا</h2><p class="muted">طبيب وعيادة اشتغلوا مع بعض 3 مرات أو أكتر ووقفوا من أكتر من شهر — غالبًا اتفقوا برا. كلّمهم واعرض «التعامل المباشر طويل الأمد».</p>` +
@@ -976,7 +1015,7 @@ async function viewAdmin(tab = 'verify'){
     const lbl = { commission_fixed_pct:'عمولة السعر الثابت %', commission_percent_pct:'عمولة النسبة % من الدخل', commission_min:'أقل عمولة (جنيه)',
       monthly_cap_pair:'سقف العمولة الشهري لنفس الطبيب والعيادة', hire_fee:'عمولة التعريف (التعامل المباشر)', hire_min:'أقل عمولة تعريف بعد الخصم',
       hire_protect_months:'مدة عدم التجاوز في الشيفتات (شهور)', hold_hours:'مهلة التحويل (ساعات)', cancel_free_hours:'الإلغاء المجاني قبل (ساعات)',
-      instapay_address:'عنوان إنستاباي', wallet_number:'رقم المحفظة', support_whatsapp:'واتساب الدعم والتوثيق (01xxxxxxxxx)',
+      instapay_address:'عنوان إنستاباي (name@instapay)', instapay_link:'لينك الدفع بإنستاباي (يبدأ بـ https://)', wallet_number:'رقم المحفظة', facebook_url:'لينك صفحة الفيسبوك (https://)', instagram_url:'لينك الإنستجرام (https://)', support_whatsapp:'واتساب الدعم والتوثيق (01xxxxxxxxx)',
       rental_min_months:'أقل مدة عقد إيجار (شهور)', rental_commission_months:'عمولة الإيجار (كام شهر إيجار)', rental_tenant_pct:'نصيب المستأجر من عمولة الإيجار %', rental_protect_months:'عدم التجاوز في الإيجار (شهور)' };
     box.innerHTML = `<div class="card stack">${st.map(x => `<div><label for="st-${x.key}">${esc(lbl[x.key] || x.key)}</label>
       <input id="st-${x.key}" value="${esc(typeof x.value === 'string' ? x.value : JSON.stringify(x.value))}" dir="ltr"></div>`).join('')}
@@ -1242,6 +1281,8 @@ async function route(){
   } catch(e) { toast(errMsg(e)); console.error(e); }
 }
 window.addEventListener('hashchange', route);
+document.addEventListener('click', e => { const c = e.target.closest('[data-copy]'); if (!c) return;
+  (navigator.clipboard ? navigator.clipboard.writeText(c.dataset.copy) : Promise.reject()).then(() => toast('اتنسخ ✓'), () => prompt('انسخ من هنا:', c.dataset.copy)); });
 
 if (configured) {
   sb.auth.onAuthStateChange((ev, session) => {
@@ -1250,6 +1291,7 @@ if (configured) {
     if (ev === 'PASSWORD_RECOVERY') { location.hash = '#/reset'; return; }
     if (changed) { S.me = null; route(); }
   });
+  sb.rpc('public_links').then(({ data }) => { if (data) { S.links = data; const f = document.querySelector('footer'); if (f) f.outerHTML = legalLinks(); } });
   sb.auth.getSession().then(({ data }) => { S.session = data.session; route(); });
 } else route();
 
