@@ -170,8 +170,8 @@ const waNum = n => { let d = String(n || '').replace(/[^0-9]/g, ''); if (d.start
 const waHref = (num, text) => `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
 function waVerifyBox(kind, st, info){
   const num = waNum(S.settings?.support_whatsapp);
-  const docs = kind === 'doctor' ? ['صورة كارنيه النقابة (الوشين)', 'أو صورة ترخيص مزاولة المهنة'] : ['صورة شهادة تسجيل العيادة في النقابة', 'أو صورة ترخيص العيادة'];
-  const msg = [`توثيق حساب ${kind === 'doctor' ? 'طبيب' : 'عيادة'} — DentaCore Shift`, ...info, `الإيميل: ${S.session.user.email}`, kind === 'doctor' ? 'مرفق: كارنيه النقابة أو ترخيص مزاولة المهنة' : 'مرفق: تسجيل العيادة في النقابة أو ترخيص العيادة'].join('\n');
+  const docs = kind === 'doctor' ? ['صورة كارنيه النقابة (الوشين)', 'أو صورة ترخيص مزاولة المهنة', 'لسه بتطلّع الكارنيه أو الترخيص؟ ابعت أي ورقة تثبت إنك ماشي في الإجراءات (زي إيصال التقديم)، وفريقنا هيراجعها ويوثّقك'] : ['صورة شهادة تسجيل العيادة في النقابة', 'أو صورة ترخيص العيادة', 'لسه بتطلّع ترخيص العيادة؟ ابعت أي ورقة تثبت إنك ماشي في الإجراءات (زي إيصال التقديم أو ملف الترخيص)، وفريقنا هيراجعها ويوثّق العيادة'];
+  const msg = [`توثيق حساب ${kind === 'doctor' ? 'طبيب' : 'عيادة'} — DentaCore Shift`, ...info, `الإيميل: ${S.session.user.email}`, kind === 'doctor' ? 'مرفق: كارنيه النقابة أو ترخيص مزاولة المهنة (أو ورق الإجراءات لو لسه بطلّعه)' : 'مرفق: تسجيل العيادة في النقابة أو ترخيص العيادة (أو ورق الإجراءات لو لسه بطلّعه)'].join('\n');
   return `<section class="card stack"><h2>التوثيق عن طريق واتساب</h2>
     ${st === 'verified' ? '<div class="notice ok">حسابك موثّق ✓</div>' : '<p style="margin:0">ابعت لفريق DentaCore Shift على واتساب ورقة واحدة من دول:</p>'}
     ${st === 'verified' ? '' : `<ul style="margin:0;padding-inline-start:20px">${docs.map(d => `<li>${d}</li>`).join('')}</ul>`}
@@ -179,6 +179,14 @@ function waVerifyBox(kind, st, info){
       : '<div class="notice">رقم واتساب التوثيق لسه بيتجهز. جرّب تاني بعد شوية.</div>'}
     <p class="muted" style="margin:0">لما تبعت ورقك، تبقى موافق إن فريق DentaCore Shift يطّلع عليه ويراجعه علشان يوثّق حسابك، حسب <a href="#/privacy">سياسة الخصوصية</a>. فريقنا عمره ما هيطلب منك كلمة السر أو أي كود.</p></section>`;
 }
+const GOVS = ['القاهرة','الجيزة','الإسكندرية','القليوبية','الشرقية','الدقهلية','الغربية','المنوفية','البحيرة','كفر الشيخ','دمياط','بورسعيد','الإسماعيلية','السويس','الفيوم','بني سويف','المنيا','أسيوط','سوهاج','قنا','الأقصر','أسوان','البحر الأحمر','الوادي الجديد','مطروح','شمال سيناء','جنوب سيناء'];
+const norm = s => String(s || '').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/\s+/g,' ').trim();
+const splitArea = v => { v = String(v || ''); const g = GOVS.find(x => norm(v).endsWith(norm(x))); if (!g) return [v, '']; const t = v.slice(0, v.length - g.length).replace(/[،,\-—\s]+$/,''); return [t, g]; };
+const govOpts = (g, any) => (any ? `<option value="">${any}</option>` : '<option value="">اختار المحافظة</option>') + GOVS.map(x => `<option ${x === g ? 'selected' : ''}>${x}</option>`).join('');
+const areaPair = (id, val, ph = 'مثال: مدينة نصر') => { const [t, g] = splitArea(val); return `<div class="grid2"><div><label for="${id}-g">المحافظة</label><select id="${id}-g" data-area="${id}">${govOpts(g)}</select></div><div><label for="${id}-t">المنطقة / الحي</label><input id="${id}-t" data-area="${id}" value="${esc(t)}" maxlength="60" placeholder="${esc(ph)}"></div></div><input type="hidden" id="${id}" value="${esc(val || '')}">`; };
+const areaMatch = (area, gov, txt) => (!gov || norm(area).includes(norm(gov))) && (!txt || norm(area).includes(norm(txt)));
+document.addEventListener('input', e => { const id = e.target.dataset?.area; if (!id) return; const t = (document.getElementById(id + '-t')?.value || '').trim(), g = document.getElementById(id + '-g')?.value || ''; const h = document.getElementById(id); if (h) h.value = [t, g].filter(Boolean).join('، '); });
+document.addEventListener('change', e => { if (e.target.dataset?.area) e.target.dispatchEvent(new Event('input', { bubbles:true })); });
 const V = k => { const v = S.settings?.[k] ?? DEF[k]; return typeof v === 'number' ? v.toLocaleString('ar-EG') : esc(v); };
 const sec = (t, items) => `<section class="card stack"><h2>${t}</h2><ul style="margin:0;padding-inline-start:20px;display:flex;flex-direction:column;gap:6px">${items.map(i => `<li>${i}</li>`).join('')}</ul></section>`;
 const contactLine = () => `واتساب الدعم: <span dir="ltr">${esc(S.settings?.support_whatsapp || LEGAL.whatsapp)}</span> · الإيميل: <span dir="ltr">${esc(LEGAL.email)}</span>`;
@@ -198,7 +206,8 @@ function legalBody(kind){
       'لازم البيانات اللي بتسجلها تكون صحيحة وكاملة، وتحدّثها لو اتغيرت.',
       'الحساب شخصي. إنت مسؤول عن كلمة السر، وعن أي حاجة بتتعمل من حسابك.']),
     sec('٣. التوثيق', [
-      'التوثيق بيتم عن طريق واتساب: بتبعت مستنداتك من زرار «ابعت ورقك على واتساب» اللي جوه حسابك، على رقم المنصة المكتوب هناك بس. الطبيب (سواء بيحجز شيفت أو بيأجّر عيادة) بيبعت كارنيه النقابة أو ترخيص مزاولة المهنة. والعيادة (سواء بتعرض شيفتات أو بتعرض العيادة للإيجار) بتبعت شهادة تسجيلها في النقابة أو ترخيص العيادة.',
+      'التوثيق بيتم عن طريق واتساب: بتبعت مستنداتك من زرار «ابعت ورقك على واتساب» اللي جوه حسابك، على رقم المنصة المكتوب هناك بس. الطبيب (سواء بيحجز شيفت أو بيأجّر عيادة) بيبعت كارنيه النقابة أو ترخيص مزاولة المهنة. والعيادة (سواء بتعرض شيفتات أو بتعرض العيادة للإيجار) بتبعت شهادة تسجيلها في النقابة أو ترخيص العيادة. ولو الطبيب أو العيادة لسه بيطلّع الكارنيه أو الترخيص، يقدر يبعت أي مستند يثبت إنه ماشي في الإجراءات، وفريق DentaCore Shift يراجعه ويقرر التوثيق حسب تقديره، وممكن يطلب ورق تاني. وفي الحالة دي يبقى الطبيب أو صاحب العيادة مسؤول لوحده إنه يكون مسموح له قانونًا يزاول المهنة أو يشغّل العيادة، وإنه يبعت الكارنيه أو الترخيص أول ما يطلع.',
+      'المنصة متاحة لأطباء وعيادات الأسنان في كل محافظات مصر.',
       'لما تبعت مستنداتك، بتوافق إن فريق DentaCore Shift المسؤول عن التوثيق يطّلع عليها ويراجعها ويتأكد من صحتها، ويتحقق منها مع الجهات المختصة لو احتاج.',
       'مفيش حجز ولا عرض شيفتات ولا طلبات إيجار قبل ما الحساب يتوثّق.',
       'من حق المنصة ترفض أو توقف أي حساب لو المستندات ناقصة أو مش مطابقة، أو لو حصلت مخالفة للشروط.',
@@ -440,10 +449,8 @@ function viewAuth(mode = 'login'){
             <button type="button" id="r-cl" aria-pressed="false">صاحب عيادة</button>
           </div></div>
         <div><label for="f-name">الاسم بالكامل</label><input id="f-name" autocomplete="name" maxlength="80"></div>
-        <div class="grid2">
-          <div><label for="f-phone">الموبايل</label><input id="f-phone" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx"></div>
-          <div><label for="f-area">المنطقة</label><input id="f-area" placeholder="مدينة نصر" maxlength="80"></div>
-        </div>` : ''}
+        <div><label for="f-phone">الموبايل</label><input id="f-phone" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx"></div>
+        ${areaPair('f-area', '')}` : ''}
       <div><label for="f-email">الإيميل</label><input id="f-email" type="email" autocomplete="email" dir="ltr"></div>
       <div><label for="f-pass">كلمة السر</label><input id="f-pass" type="password" autocomplete="${mode === 'login' ? 'current-password' : 'new-password'}" dir="ltr" minlength="8"></div>
       ${mode === 'signup' ? `<label style="display:flex;gap:10px;align-items:flex-start;color:var(--ink);font-size:14px">
@@ -498,16 +505,17 @@ async function viewShifts(){
   if (f.mode) q = q.eq('mode', f.mode);
   if (f.date) q = q.eq('shift_date', f.date);
   let rows = must(await q);
-  if (f.area) rows = rows.filter(s => (s.clinics?.area || '').includes(f.area));
+  rows = rows.filter(s => areaMatch(s.clinics?.area, f.gov, f.area));
   const d = S.doctor;
   app.querySelector('main').innerHTML = `
     <div><p class="muted" style="margin:0">أهلًا د. ${esc(S.me.full_name)}</p><h1>شيفتات متاحة</h1></div>
     ${d.status !== 'verified' ? `<div class="notice">${d.status === 'rejected' ? 'ملفك اترفض: ' + esc(d.reject_reason || '') + ' — كلّمنا على واتساب من «ملفي».' : 'تقدر تتفرج دلوقتي، والحجز بيتفتح بعد ما ملفك يتوثّق.'} <a href="#/profile">ابعت ورقك على واتساب</a></div>` : ''}
     <div class="card stack">
       <div class="grid2">
+        <div><label for="fg">المحافظة</label><select id="fg">${govOpts(f.gov || '', 'كل المحافظات')}</select></div>
         <div><label for="fa">المنطقة</label><input id="fa" value="${esc(f.area || '')}" placeholder="أي منطقة"></div>
-        <div><label for="fd">اليوم</label><input id="fd" type="date" value="${esc(f.date || '')}"></div>
       </div>
+      <div><label for="fd">اليوم</label><input id="fd" type="date" value="${esc(f.date || '')}"></div>
       <div><label for="fm">طريقة الدفع</label><select id="fm"><option value="">الكل</option>
         <option value="fixed" ${f.mode === 'fixed' ? 'selected' : ''}>سعر ثابت</option>
         <option value="percent" ${f.mode === 'percent' ? 'selected' : ''}>نسبة من الدخل</option></select></div>
@@ -522,7 +530,7 @@ async function viewShifts(){
         <div class="between"><div><div class="price">${priceText(s)}</div><div class="muted">${modeText(s)}</div></div>
           <a class="btn" href="#/shift/${s.id}">التفاصيل</a></div>
       </article>`).join('') : '<div class="card muted">مفيش شيفتات بالبحث ده دلوقتي. جرّب يوم أو منطقة تانية.</div>'}`;
-  $('apply').onclick = () => { sessionStorage.setItem('flt', JSON.stringify({ area:$('fa').value.trim(), date:$('fd').value, mode:$('fm').value })); viewShifts(); };
+  $('apply').onclick = () => { sessionStorage.setItem('flt', JSON.stringify({ gov:$('fg').value, area:$('fa').value.trim(), date:$('fd').value, mode:$('fm').value })); viewShifts(); };
 }
 
 async function viewShift(id){
@@ -684,8 +692,8 @@ async function viewProfile(){
     </section>
     <section class="card stack"><h2>بياناتي</h2>
       <div><label for="p-name">الاسم</label><input id="p-name" value="${esc(p.full_name)}" maxlength="80"></div>
-      <div class="grid2"><div><label for="p-phone">الموبايل</label><input id="p-phone" dir="ltr" value="${esc(c.phone || '')}"></div>
-        <div><label for="p-area">المنطقة</label><input id="p-area" value="${esc(p.area || '')}"></div></div>
+      <div><label for="p-phone">الموبايل</label><input id="p-phone" dir="ltr" value="${esc(c.phone || '')}"></div>
+      ${areaPair('p-area', p.area)}
       <div><label for="p-ip">إنستاباي أو محفظة (للاسترداد)</label><input id="p-ip" dir="ltr" value="${esc(c.instapay || '')}"></div>
       <div class="grid2"><div><label for="p-syn">رقم كارنيه النقابة</label><input id="p-syn" value="${esc(d.syndicate_no || '')}"></div>
         <div><label for="p-gy">سنة التخرج</label><input id="p-gy" type="number" value="${esc(d.grad_year || '')}"></div></div>
@@ -723,7 +731,7 @@ async function viewClinicEdit(){
     ${c ? `<div>${chip(c.status)} ${c.status === 'rejected' && c.reject_reason ? `<span class="muted">${esc(c.reject_reason)}</span>` : ''}</div>` : '<p class="muted">بعد المراجعة والتوثيق تقدر تعرض شيفتات.</p>'}
     <section class="card stack">
       <div><label for="c-name">اسم العيادة (زي الترخيص)</label><input id="c-name" value="${esc(c?.name || '')}" maxlength="80"></div>
-      <div><label for="c-area">المنطقة</label><input id="c-area" value="${esc(c?.area || S.me.area || '')}" maxlength="80" placeholder="مدينة نصر — الحي السابع"></div>
+      ${areaPair('c-area', c?.area || S.me.area || '', 'مثال: مدينة نصر — الحي السابع')}
       <div><label for="c-eq">التجهيزات (افصل بفاصلة)</label><input id="c-eq" value="${esc((c?.equipment || []).join('، '))}" placeholder="أشعة، روتاري، أبكس، أوتوكلاف، مساعدة"></div>
       <div><label for="c-addr">العنوان بالتفصيل (فريقنا بيبعته للطبيب بعد تأكيد الحجز)</label><input id="c-addr" value="${esc(priv.address || '')}" maxlength="300"></div>
       <div><label for="c-map">لينك جوجل ماب</label><input id="c-map" dir="ltr" value="${esc(priv.map_link || '')}"></div>
@@ -906,7 +914,7 @@ async function viewAdmin(tab = 'verify'){
     const cls = must(await sb.rpc('clinic_full')).filter(c => c.status === 'pending');
     const n = await names([...docs.map(d => d.id), ...cls.map(c => c.owner_id)]), ct = await contacts([...docs.map(d => d.id), ...cls.map(c => c.owner_id)]);
     const wa = (uid, txt) => { const num = waNum(ct[uid]?.phone); return num ? `<a class="btn wa" style="min-height:38px" href="${esc(waHref(num, txt))}" target="_blank" rel="noopener">${icon.wa} واتساب</a>` : '<span class="muted">مفيش رقم</span>'; };
-    box.innerHTML = `<p class="muted">الورق بيوصلك على واتساب. الطبيب: كارنيه النقابة أو ترخيص مزاولة المهنة. العيادة: تسجيلها في النقابة أو ترخيصها. راجع الورقة، وبعدين وثّق أو ارفض. امسح صور الورق من المحادثة بعد 30 يوم من التوثيق.</p><h2>أطباء (${docs.length})</h2>` + (docs.map(d => `<div class="card stack">
+    box.innerHTML = `<p class="muted">الورق بيوصلك على واتساب. الطبيب: كارنيه النقابة أو ترخيص مزاولة المهنة. العيادة: تسجيلها في النقابة أو ترخيصها. ولو لسه بيطلّعه: ورقة تثبت إنه ماشي في الإجراءات، وقرارك حسب تقديرك. راجع الورقة، وبعدين وثّق أو ارفض. امسح صور الورق من المحادثة بعد 30 يوم من التوثيق.</p><h2>أطباء (${docs.length})</h2>` + (docs.map(d => `<div class="card stack">
         <strong>د. ${esc(n[d.id])}</strong><div class="muted">كارنيه: ${esc(d.syndicate_no || '—')} · دفعة ${esc(d.grad_year || '—')}</div>
         <div class="muted" dir="ltr" style="text-align:right">${esc(ct[d.id]?.phone || '')}</div>
         <div class="row">${wa(d.id, `أهلًا د. ${n[d.id] || ''}، معاك فريق DentaCore Shift بخصوص توثيق حسابك.`)}${d.card_path ? docBtn(d.card_path,'الكارنيه') : ''}${d.cert_path ? docBtn(d.cert_path,'الشهادة') : ''}</div>
@@ -1055,14 +1063,14 @@ const howRental = rent => `<section class="card stack"><h2>الإيجار بيت
 
 async function viewRentals(){
   shell('<div class="spin">جاري التحميل…</div>', '#/rentals');
-  const area = sessionStorage.getItem('rarea') || '';
+  const area = sessionStorage.getItem('rarea') || '', rgov = sessionStorage.getItem('rgov') || '';
   let rows = must(await sb.from('rentals').select('*').eq('status','active').order('created_at', { ascending:false }).limit(80));
-  if (area) rows = rows.filter(r => r.area.includes(area));
+  rows = rows.filter(r => areaMatch(r.area, rgov, area));
   app.querySelector('main').innerHTML = `
     <div><h1>عيادات للإيجار السنوي</h1>
       <p class="muted" style="margin:0">عيادات كاملة للإيجار بعقد سنة على الأقل. التواصل مع المالك بيكون عن طريق فريق DentaCore Shift لحد إمضاء العقد.</p></div>
     <div class="between"><a class="btn sec" href="#/my-rentals">طلباتي</a></div>
-    <div class="card row"><input id="ra" value="${esc(area)}" placeholder="المنطقة" style="flex:1" aria-label="المنطقة"><button class="btn sec" id="rgo">بحث</button></div>
+    <div class="card stack"><div class="grid2"><select id="rg" aria-label="المحافظة">${govOpts(rgov, 'كل المحافظات')}</select><input id="ra" value="${esc(area)}" placeholder="المنطقة" aria-label="المنطقة"></div><button class="btn sec" id="rgo">بحث</button></div>
     ${rows.length ? rows.map(r => `
       <article class="card stack">
         ${r.photo_paths[0] ? `<img src="${esc(mediaUrl(r.photo_paths[0]))}" alt="" loading="lazy" style="width:100%;height:170px;object-fit:cover;border-radius:12px">` : ''}
@@ -1071,7 +1079,7 @@ async function viewRentals(){
         <div class="between"><div><div class="price">${money(r.monthly_rent)}</div><div class="muted">في الشهر · عقد ${r.min_months.toLocaleString('ar-EG')} شهر على الأقل</div></div>
           <a class="btn" href="#/rental/${r.id}">التفاصيل</a></div>
       </article>`).join('') : '<div class="card muted">مفيش عيادات معروضة بالبحث ده دلوقتي.</div>'}`;
-  $('rgo').onclick = () => { sessionStorage.setItem('rarea', $('ra').value.trim()); viewRentals(); };
+  $('rgo').onclick = () => { sessionStorage.setItem('rarea', $('ra').value.trim()); sessionStorage.setItem('rgov', $('rg').value); viewRentals(); };
 }
 
 async function viewRental(id){
@@ -1148,8 +1156,8 @@ async function viewRentalEdit(id){
     ${r ? `<div>${chip(r.status)} <span class="muted">تغيير السعر أو الوصف أو الصور بيرجّع الإعلان للمراجعة.</span></div>` : '<p class="muted" style="margin:0">فريقنا بيراجع الإعلان قبل ما يظهر للأطباء.</p>'}
     <section class="card stack">
       <div><label for="e-t">عنوان الإعلان</label><input id="e-t" maxlength="100" value="${esc(r?.title || '')}" placeholder="عيادة أسنان مجهزة بالكامل — كرسيين"></div>
-      <div class="grid2"><div><label for="e-a">المنطقة</label><input id="e-a" maxlength="80" value="${esc(r?.area || S.clinic?.area || '')}"></div>
-        <div><label for="e-r">الإيجار الشهري (جنيه)</label><input id="e-r" type="number" inputmode="numeric" value="${esc(r?.monthly_rent || '')}"></div></div>
+      ${areaPair('e-a', r?.area || S.clinic?.area || '')}
+      <div><label for="e-r">الإيجار الشهري (جنيه)</label><input id="e-r" type="number" inputmode="numeric" value="${esc(r?.monthly_rent || '')}"></div>
       <div class="grid2"><div><label for="e-m">أقل مدة للعقد (شهور)</label><input id="e-m" type="number" min="${minM}" value="${esc(r?.min_months || minM)}"></div>
         <div><label for="e-f">التجهيز</label><select id="e-f">${furnishOpts.map(o => `<option ${r?.furnished === o ? 'selected' : ''}>${o}</option>`).join('')}</select></div></div>
       <div class="grid2"><div><label for="e-s">المساحة (م²)</label><input id="e-s" type="number" value="${esc(r?.size_m2 || '')}"></div>
